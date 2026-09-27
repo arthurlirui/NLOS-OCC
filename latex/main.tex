@@ -1,0 +1,862 @@
+% =============================================================================
+% main.tex — A Survey on Non-Line-of-Sight Optical Camera Communication
+% Companion to refs.bib (36 references)
+% =============================================================================
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{cite}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{array}
+\usepackage{tabularx}
+
+\geometry{margin=2.2cm}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!60!black,
+  citecolor=teal!70!black,
+  urlcolor=blue!60!black
+}
+
+% Convenience macros
+\newcommand{\rp}[1]{\textbf{RP#1}}
+\newcommand{\etc}{\textit{etc.}\ }
+\newcommand{\eg}{\textit{e.g.}\ }
+\newcommand{\ie}{\textit{i.e.}\ }
+
+\title{Non-Line-of-Sight Optical Camera Communication: \\
+       A Survey of Research Frontiers and Technical Details}
+
+\author{
+  NLOS-OCC Research Group
+}
+
+\date{September 2026}
+
+% =============================================================================
+\begin{document}
+\maketitle
+
+% -----------------------------------------------------------------------------
+\begin{abstract}
+Non-Line-of-Sight Optical Camera Communication (NLOS-OCC) extends
+conventional optical camera communication beyond direct visibility by
+exploiting diffuse reflections, partial occlusions, and ambient-light
+scattering to recover data from light-emitting diode (LED) signals that
+never reach the camera along a free-space path. The central technical
+contradiction is that LEDs are modulated in the MHz range while consumer
+cameras sample at 30--60 frames per second, so a single frame cannot
+resolve individual symbols directly. This survey organizes the rapidly
+expanding NLOS-OCC literature into a five-layer research framework
+comprising twelve research points ($\rp{1}$--$\rp{12}$): physical-layer
+channel modelling, modulation and coding, signal recovery, hardware and
+receiver front-ends, networking, and applications. For each layer we
+distil the key technical mechanisms---Barker-code pilots, differential
+dual-bit processing, rolling-shutter stripe extraction, U-Net bit
+segmentation, generative-adversarial background/stripe separation,
+event-camera asynchronous detection, reconfigurable intelligent surfaces
+(RIS), MIMO and NOMA schemes, and learning-based smartphone OCC
+architectures. We further survey four emerging directions
+($\rp{13}$--$\rp{16}$): UAV-mounted OCC, underwater and cross-medium
+OCC, semantic optical communication toward AI-native 6G, and
+retroreflective optical integrated sensing and communication (RO-ISAC).
+We further examine the recently approved IEEE~802.15.7a-2024 amendment
+whose PHY~VII defines seven OCC modes targeting 200\,m range and
+350\,km/h mobility. We close with a prioritized roadmap that traces the
+dependency chain from channel characterization through signal recovery
+and networking to end-user applications, identifying near-, mid-, and
+long-term research priorities.
+\end{abstract}
+
+\noindent\textbf{Index Terms}---Optical camera communication (OCC),
+non-line-of-sight (NLOS), visible light communication (VLC), rolling
+shutter, deep learning, event camera, MIMO, RIS, IEEE 802.15.7a,
+vehicular communication, Internet of Things, UAV, underwater OCC,
+semantic communication, integrated sensing and communication (ISAC).
+
+% =============================================================================
+\section{Introduction}
+\label{sec:intro}
+
+Optical Camera Communication (OCC) is a branch of visible light
+communication (VLC) in which the receiver is an image sensor rather
+than a photodiode~\cite{ieee8021572018}. By spatially resolving light
+sources, a camera can discriminate among multiple transmitters and
+reject ambient interference in a way that single-element receivers
+cannot. The cost of this spatial selectivity is a severe temporal
+sampling limitation: a commodity camera captures 30--60 frames per
+second, while the LED driving signal may be modulated at MHz
+frequencies. The rolling-shutter effect, whereby successive rows of the
+sensor are exposed at slightly different times, partially alleviates
+this by spreading a time-varying signal across the image rows, producing
+characteristic light-and-dark \emph{stripes}; but it cannot match the
+throughput of photodiode-based VLC.
+
+The challenge becomes even more acute when the line-of-sight path
+between the LED and the camera is blocked. In Non-Line-of-Sight OCC
+(NLOS-OCC), the camera must recover data from diffuse reflections off
+walls, the ground, or other surfaces, or from partially occluded sources
+seen through glass or foliage. The received optical power is drastically
+reduced, the signal is smeared by the bidirectional reflectance
+distribution function (BRDF) of the reflecting surface, and the
+background illumination is heterogeneous. Yet NLOS operation is
+essential for practical deployment: in vehicular scenarios vehicles are
+frequently obscured by other traffic; in indoor scenarios furniture and
+occupants block direct paths; and in smart-city deployments street
+furniture creates persistent occlusions.
+
+This survey organizes the NLOS-OCC literature into a five-layer research
+framework (Fig.~\ref{fig:framework}) and twelve core research points
+($\rp{1}$--$\rp{12}$), summarized in Table~\ref{tab:rps}, plus four
+emerging directions ($\rp{13}$--$\rp{16}$) surveyed in
+Section~\ref{sec:emerging}. The framework
+mirrors the protocol stack: the physical layer ($\rp{1}$--$\rp{3}$)
+covers channel modelling, modulation, and coding; the signal-recovery
+layer ($\rp{4}$--$\rp{6}$) covers noise suppression, deep-learning
+extraction, and event-camera detection; the hardware layer
+($\rp{7}$--$\rp{8}$) covers smartphone receivers and RIS-enhanced links;
+the network layer ($\rp{9}$--$\rp{10}$) covers MIMO and heterogeneous
+fusion; the application layer ($\rp{11}$--$\rp{12}$) covers
+V2V/V2I/IoT systems; and the emerging layer ($\rp{13}$--$\rp{16}$)
+covers UAV, underwater, semantic, and ISAC frontiers.
+
+\begin{table*}[t]
+\centering
+\caption{The NLOS-OCC research framework: sixteen research points across six layers.}
+\label{tab:rps}
+\small
+\begin{tabularx}{\textwidth}{l l X}
+\toprule
+\textbf{Layer} & \textbf{RP} & \textbf{Focus} \\
+\midrule
+Physical ($\rp{1}$--$\rp{3}$) & $\rp{1}$ & NLOS-OCC channel modelling (BRDF, ray tracing, geometry) \\
+ & $\rp{2}$ & Modulation schemes (OOK, PWM, UFSOOK, CSK, CSS, N-pulse, adaptive) \\
+ & $\rp{3}$ & Channel coding (Raptor/RaptorQ fountain codes, RS, FEC) \\
+\midrule
+Signal Recovery ($\rp{4}$--$\rp{6}$) & $\rp{4}$ & Noise suppression and adaptive thresholding \\
+ & $\rp{5}$ & Deep-learning signal recovery (U-Net, CNN, GAN, autoencoder) \\
+ & $\rp{6}$ & Event-camera / neuromorphic asynchronous detection \\
+\midrule
+Hardware ($\rp{7}$--$\rp{8}$) & $\rp{7}$ & Smartphone OCC (Pro mode, RAW domain, deep-learning demodulation) \\
+ & $\rp{8}$ & RIS / ORIS for NLOS coverage enhancement \\
+\midrule
+Network ($\rp{9}$--$\rp{10}$) & $\rp{9}$ & MIMO schemes (WDM-MIMO, SDM, 2$\times$N, MIMO-NOMA) \\
+ & $\rp{10}$ & Heterogeneous fusion (OCC/BLE, OCC/WiFi, 6G, IEEE 802.15.7a) \\
+\midrule
+Applications ($\rp{11}$--$\rp{12}$) & $\rp{11}$ & V2V / V2I / ITS vehicular systems \\
+ & $\rp{12}$ & Indoor VLP, IoT, ISAC, smart-city deployment \\
+\midrule
+Emerging ($\rp{13}$--$\rp{16}$) & $\rp{13}$ & UAV-mounted OCC (drone receiver, 360$^\circ$ FOV) \\
+ & $\rp{14}$ & Underwater and cross-medium (air-water) OCC \\
+ & $\rp{15}$ & Semantic optical communication, AI-native 6G integration \\
+ & $\rp{16}$ & Retroreflective optical ISAC (RO-ISAC) \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox{0.92\columnwidth}{\centering\small
+  \textbf{Emerging} ($\rp{13}$--$\rp{16}$): UAV, underwater, semantic 6G, RO-ISAC\\
+  $\updownarrow$\\
+  \textbf{Application} ($\rp{11}$,$\rp{12}$): V2V/V2I, IoT, ISAC\\
+  $\updownarrow$\\
+  \textbf{Network} ($\rp{9}$,$\rp{10}$): MIMO, heterogeneous fusion, 802.15.7a\\
+  $\updownarrow$\\
+  \textbf{Hardware} ($\rp{7}$,$\rp{8}$): smartphone OCC, RIS\\
+  $\updownarrow$\\
+  \textbf{Signal Recovery} ($\rp{4}$--$\rp{6}$): denoising, deep learning, event cameras\\
+  $\updownarrow$\\
+  \textbf{Physical} ($\rp{1}$--$\rp{3}$): channel, modulation, coding}}
+  \caption{Five-layer NLOS-OCC research framework. Information flows
+  upward; constraints propagate downward. The dependency chain
+  $\rp{1}\rightarrow\rp{4}/\rp{6}\rightarrow\rp{9}\rightarrow\rp{11}$
+  defines the critical research path.}
+  \label{fig:framework}
+\end{figure}
+
+The remainder of the paper follows the framework layer by layer
+(Sections~\ref{sec:physical}--\ref{sec:applications}), surveys four
+emerging research directions (Section~\ref{sec:emerging}), examines the
+IEEE~802.15.7a-2024 standard (Section~\ref{sec:standard}), and closes
+with a prioritized roadmap and conclusions
+(Sections~\ref{sec:roadmap}--\ref{sec:conclusion}).
+
+% =============================================================================
+\section{Physical Layer: Channel, Modulation, and Coding}
+\label{sec:physical}
+
+\subsection{NLOS-OCC Channel Modelling ($\rp{1}$)}
+\label{sec:rp1}
+
+The NLOS-OCC channel departs fundamentally from the LOS VLC channel.
+Instead of a direct irradiance link, the received optical power is the
+integral of the LED radiance reflected by one or more surfaces whose
+BRDF may be Lambertian, specular, or mixed. Three modelling approaches
+dominate the literature.
+
+\paragraph{Analytical BRDF models.}
+A Lambertian reflector re-emits incident light uniformly in all
+directions with radiance proportional to the cosine of the exit angle.
+Real surfaces---asphalt, painted walls, foliage---deviate from this
+ideal, and the deviation directly affects the spatial distribution of
+received power across the image sensor. The pilot-aided NLOS-OCC work of
+Chen \emph{et al.}~\cite{chen2021pilot} measured a 2.5\,m NLOS link under
+heterogeneous background light, demonstrating that the pilot-based
+signal-logging and estimation (PSLE) scheme combined with enhanced
+visual compensation (EVC) can recover data where unaided thresholding
+fails entirely. The experiment confirms that the reflected-signal
+contrast ratio is typically 5--15\,dB below the LOS case, placing a hard
+floor on the achievable stripe signal-to-noise ratio.
+
+\paragraph{Ray-tracing simulation.}
+For vehicular MIMO channels, Liu and Dang~\cite{liu2023vehicular}
+proposed a three-dimensional irregular-shaped geometry-based stochastic
+model (3D IS-GBSM) that captures the birth-death process of scattering
+clusters as vehicles move. The model parameters are derived from
+OpticStudio ray tracing and validated against measured
+power-delay profiles. The same ray-tracing approach underlies the
+MIMO V2V-VLC study of Yahia \emph{et al.}~\cite{yahia2022mimo}, which
+simulates dual-transmitter headlight configurations and weather-dependent
+attenuation (clear, rain, fog). A key finding is that MIMO spatial
+multiplexing gain collapses rapidly as fog visibility drops below
+100\,m, motivating the adaptive and coding strategies discussed in
+Section~\ref{sec:rp3}.
+
+\paragraph{Pilot-based long-distance NLOS.}
+Dong \emph{et al.}~\cite{dong2023barker} achieved a 5\,m NLOS-OCC link
+using a Barker-code pilot and a differential dual-bit processing (DDBP)
+algorithm. The Barker code's autocorrelation property lets the receiver
+locate the pilot in the stripe sequence even when the reflected signal
+is deeply buried in ambient light; DDBP then cancels the slowly varying
+background by subtracting consecutive bit windows. The 7\% forward-error-
+correction (FEC) threshold was met at 5\,m, extending the practical
+NLOS range beyond earlier pilot-free demonstrations.
+
+\subsection{Modulation Schemes ($\rp{2}$)}
+\label{sec:rp2}
+
+OCC modulation must respect the camera's sampling constraints. The
+principal families are:
+
+\begin{itemize}
+  \item \textbf{OOK / PWM.} On-off keying and pulse-width modulation are
+    the simplest schemes. With rolling shutter, each symbol produces a
+    band of bright or dark rows. The symbol rate is limited to roughly
+    $f_s / 2$ where $f_s$ is the effective row-sampling frequency
+    (typically a few kHz).
+  \item \textbf{UFSOOK.} Undersampled Frequency Shift OOK modulates at a
+    frequency that aliases to a distinguishable low frequency under the
+    camera's sampling, enabling per-frame demodulation without relying
+    on rolling shutter. The MIMO extension~\cite{mimoufsook2013} maps
+    different frequencies to spatially separated LEDs, achieving a
+    rudimentary spatial-multiplexing gain.
+  \item \textbf{CSK / Color barcode.} Color Shift Keying encodes data in
+    the colour coordinate of the emitted light. COBRA~\cite{cobra2012}
+    demonstrated real-time colour-barcode streaming to smartphones, and
+    the approach extends naturally to multi-colour LED arrays. CSK's
+    chromaticity constraint (perceptual flicker avoidance) limits the
+    practical constellation size.
+  \item \textbf{Spatial modulation / PixNet.} PixNet~\cite{pixnet2010}
+    treats an LED array as a 2D spatial modulator, encoding blocks of
+    bits in the on/off pattern of individual elements. This is the
+    screen-camera analog of MIMO spatial modulation and achieves the
+    highest raw rates among OCC schemes, but requires a well-resolved
+    array image---difficult in NLOS conditions.
+  \item \textbf{Adaptive modulation.} Shirvani \emph{et al.}
+    \cite{shirvani2021adaptive} investigated adaptive thresholding for
+    V2V OCC where a mobile-phone camera receives LED taillight signals.
+    The threshold is adjusted per-frame based on the measured stripe
+    intensity statistics, accommodating the rapid variation in channel
+    gain as the vehicles' relative position changes.
+\end{itemize}
+
+For NLOS links specifically, the modulation choice is constrained by the
+low contrast of the reflected signal. Pure OOK with a fixed threshold
+fails because the reflected intensity varies with surface geometry;
+adaptive and differential schemes (DDBP, PSLE) are essential.
+
+\subsection{Channel Coding ($\rp{3}$)}
+\label{sec:rp3}
+
+Because the NLOS-OCC channel suffers deep fades from surface
+roughness, transient occlusions, and frame drops, rateless and fountain
+codes are particularly attractive: they generate as many encoded
+symbols as needed until the receiver acknowledges successful decoding,
+gracefully adapting to the unknown channel quality.
+
+Raptor codes were applied to free-space optical communication by Lu
+\emph{et al.}~\cite{lu2016raptor}, and RaptorQ---a more robust variant
+with near-MDS (minimum distance separable) performance---was studied
+under atmospheric turbulence by Pernice \emph{et al.}
+\cite{pernice2016raptorq}. RaptorQ's advantage in the OCC context is
+its ability to recover the original block from any sufficiently large
+subset of received symbols, tolerating the bursty erasures that arise
+when a vehicle passes behind an obstruction and the camera drops several
+consecutive frames.
+
+The IEEE 802.15.7a-2024 amendment (Section~\ref{sec:standard}) adopts
+Reed-Solomon (RS) codes in its RS-OFDM mode, combined with convolutional
+or LDPC inner codes, providing a standardized alternative to the
+research-grade RaptorQ approach.
+
+% =============================================================================
+\section{Signal Recovery Layer}
+\label{sec:signal}
+
+\subsection{Noise Suppression and Adaptive Thresholding ($\rp{4}$)}
+\label{sec:rp4}
+
+In NLOS-OCC the signal of interest---the faint stripe pattern from a
+reflected LED---is superimposed on a spatially varying background
+comprising ambient illumination, other light sources, and the reflecting
+surface's own texture. Classical thresholding assumes a stationary
+background; in NLOS this assumption fails.
+
+The pilot-aided approaches ($\rp{1}$) already incorporate background
+cancellation (DDBP, EVC). Beyond these, adaptive per-stripe thresholding
+\cite{shirvani2021adaptive} estimates the local mean and variance from
+the stripe's own row profile and sets a threshold at the midpoint,
+yielding robust demodulation under vehicle motion. For quasi-NLOS
+screen-camera links through glass, Wang \emph{et al.}
+\cite{screencamera2015} demonstrated that the glass reflection creates a
+secondary image that can be separated by disparity cues, recovering
+communication behind the glass. For long-distance outdoor links where
+atmospheric turbulence causes intensity fluctuations, Li \emph{et al.}
+\cite{li2026manchester} proposed a Manchester-coding-based demodulation
+that exploits the guaranteed level transition in each symbol period,
+making the decoder robust to slow scintillation that would defeat a
+fixed threshold.
+
+\subsection{Deep-Learning Signal Recovery ($\rp{5}$)}
+\label{sec:rp5}
+
+The last several years have seen a rapid migration from hand-crafted
+signal processing to learned pipelines. The principal architectures are:
+
+\paragraph{U-Net bit segmentation.}
+A U-Net semantic-segmentation network can be trained to produce a
+pixel-level binary mask classifying each pixel as ``bright stripe'' or
+``dark stripe'' \cite{unet2025nlos}. The encoder--decoder structure with
+skip connections preserves the fine spatial detail of the stripe edges,
+which a plain CNN classifier tends to blur. Once the mask is obtained,
+the bit sequence follows by simple row-major reading. This approach is
+particularly effective for NLOS reflections where the stripe boundaries
+are diffuse and the contrast is low.
+
+\paragraph{GAN-based background/stripe separation.}
+When the background is dynamic---moving vehicles, changing illumination,
+flickering displays---a fixed or slowly adaptive threshold cannot
+separate signal from background. A generative adversarial network can be
+trained to decompose the captured image into a stripe component and a
+background component, the discriminator enforcing that the generated
+background is indistinguishable from real background-only frames
+\cite{ganocc2026}. The separated stripe image is then demodulated with
+conventional or learned decoders. The GAN approach has been shown to
+reduce bit-error rate under motion and partial occlusion, achieving
+usable NLOS communication at 2.5\,m with $10^{-4}$ BER in the
+remote-control demonstration of Ahmed \emph{et al.} (DOI
+10.1109/JPHOT.2023.3250455).
+
+\paragraph{Two-stage and end-to-end DNN.}
+A two-stage pipeline---LED detection followed by stripe
+classification---reduces the search space before demodulation, improving
+both accuracy and latency. End-to-end autoencoders that map bits to LED
+drive signals and images back to bits have been explored for LOS OCC and
+are a promising direction for NLOS, though training-data scarcity for
+the NLOS channel remains an obstacle. For multi-level Colour Shift
+Keying (CSK), Furukawa \emph{et al.} \cite{furukawa2025cskdl} showed
+that a deep-learning equalizer can compensate the constellation
+distortion caused by hue shifts of the light source and the image
+sensor's internal colour processing, recovering the nominal CSK
+constellation points and improving demodulation accuracy---an important
+step toward high-spectral-efficiency OCC beyond binary modulation.
+
+\subsection{Event Cameras and Neuromorphic Detection ($\rp{6}$)}
+\label{sec:rp6}
+
+The most architecturally radical approach to the sampling bottleneck is
+to abandon the frame-based camera entirely. An event camera (Dynamic
+Vision Sensor, DVS) fires an asynchronous pixel-level event whenever the
+log-intensity at that pixel changes by more than a threshold. Because
+the LED's high-frequency modulation produces continuous intensity
+changes, the event camera effectively samples the signal at
+$\sim$20\,kHz---three orders of magnitude above frame-based cameras.
+
+The neuromorphic NLOS-OWC work \cite{neuromorphic2025nlos} (arXiv
+2503.11226) is the first demonstration of event-camera-based NLOS optical
+wireless communication. Key results include an effective sampling rate
+of $\sim$20\,kHz and a dynamic range of 120\,dB, the latter being
+critical for NLOS where the reflected signal may span several orders of
+magnitude as the reflecting surface geometry changes. The motion-aware
+event-camera OCC study \cite{event2024motion} further shows that the
+asynchronous detection is inherently tolerant to transmitter and receiver
+motion, a property that is highly desirable for vehicular deployment.
+
+The trade-off is that event cameras produce sparse, asynchronous data
+streams that require fundamentally different processing pipelines
+(spiking neural networks, event-to-frame conversion, or direct
+event-based decoding) compared to the image-centric pipelines of
+$\rp{4}$--$\rp{5}$.
+
+% =============================================================================
+\section{Hardware Layer}
+\label{sec:hardware}
+
+\subsection{Smartphone OCC: Pro Mode, RAW Domain, and Learning-Based Demodulation ($\rp{7}$)}
+\label{sec:rp7}
+
+The ultimate deployment target for much OCC research is the commodity
+smartphone, whose camera is ubiquitous but whose image signal processor
+(ISP) is optimized for photography, not communication. The ISP applies
+auto-exposure, auto-white-balance, demosaicing, denoising, and
+JPEG/H.265 compression---each of which can destroy the faint stripe
+pattern that carries data.
+
+\paragraph{WinkLink / Xiao \emph{et al.}}
+The MobiSys~2024 work of Xiao \emph{et al.}~\cite{winklink2024} tackles
+the hardest practical case: optical camera communication when the LED
+emitter is \emph{unseen} (outside the camera's field of view or occluded
+by complex, non-uniform backgrounds). The system employs a two-stage
+deep neural network. The first stage performs context-aware
+demodulation: it learns to separate the faint data-bearing stripe
+pattern from arbitrary background clutter (posters, textured walls,
+mixed illumination) that would defeat any fixed-threshold detector. The
+second stage reconstructs the transmitted bits from the cleaned signal.
+Crucially, the network is trained entirely on \emph{synthesized} data
+---rendered stripes composited onto photographed backgrounds---yet
+generalizes to the real world: it was validated in 12 distinct
+environments and tolerates device motion during capture. Quantitatively,
+the system operates at $-20$\,dB SNR, delivers a $5.8$\,dB SNR gain over
+the best baseline, and extends the effective communication distance by
+$5.5\times$ (reaching 11\,m with a 10\,W LED). This data-driven,
+learning-centric approach represents a paradigm shift from the
+hand-crafted signal-processing pipelines that dominate earlier OCC
+literature, and it directly addresses the NLOS ``complex background''
+problem that is the central challenge of this survey.
+
+\paragraph{Passive and ambient-light approaches.}
+PassiveVLC~\cite{passivevlc2017} (MobiCom 2017) takes a complementary
+approach: rather than driving an LED, it modulates the reflectance of a
+passive tag illuminated by ambient light, enabling backscatter
+communication with zero transmit energy. LightSync~\cite{lightsync2013}
+(MobiCom 2013) uses ambient light fluctuations for passive inter-device
+clock synchronization, a building block for any OCC system that must
+align transmitter and receiver timing without a shared reference.
+
+\paragraph{Pro mode and 4CASK-OCC.}
+Modern smartphone camera APIs (Android Camera2, iOS AVFoundation) expose
+manual exposure, focus, and ISO controls. Exploiting these ``Pro mode''
+settings---short exposure, fixed white balance, high ISO---substantially
+improves stripe visibility. The 4CASK-OOC scheme (four-colour CSK)
+extends the colour-barcode idea to the smartphone's Bayer pattern,
+mapping symbols to quadrants of the CIE colour space to maximize
+perceptual-flicker-free throughput.
+
+\subsection{RIS / ORIS for NLOS Coverage ($\rp{8}$)}
+\label{sec:rp8}
+
+When no reflecting surface is available, or when the natural reflection
+is too weak, a Reconfigurable Intelligent Surface (RIS) can be deployed
+to create an artificial NLOS path. An RIS is a planar array of
+sub-wavelength elements whose reflection phase can be controlled
+electronically, allowing the surface to steer an incident beam toward
+the receiver even when the transmitter and receiver are not mutually
+visible.
+
+The RIS-ISAC study \cite{risisac2025v2x} formulates the joint
+beamforming design for an RIS-assisted integrated sensing and
+communication (ISAC) V2X system, minimizing the Cram\'er-Rao bound of
+the sensing estimate subject to SINR constraints on the communication
+links. Reported coverage enhancements are 15--20\,dB in the NLoS region,
+transforming an unusable blocked link into one with margin to spare. For
+OCC specifically, an outdoor RIS (ORIS) can redirect a vehicle's
+headlight modulation toward a roadside camera that would otherwise be in
+shadow, bridging the coverage gap at intersections and in urban canyons.
+
+% =============================================================================
+\section{Network Layer}
+\label{sec:network}
+
+\subsection{MIMO Schemes ($\rp{9}$)}
+\label{sec:rp9}
+
+Multiple-input multiple-output (MIMO) techniques increase throughput and
+reliability by exploiting the spatial dimension. In OCC, the camera's
+spatial resolution is a natural enabler: each LED in an array can carry
+an independent data stream, and the image sensor separates them by
+location.
+
+\paragraph{WDM-MIMO and SDM.}
+Wavelength-division multiplexing (WDM) assigns different colours
+(R/G/B) to different streams; space-division multiplexing (SDM) assigns
+different physical LEDs. Both are limited by the camera's colour
+separation and spatial resolution, respectively.
+
+\paragraph{2$\times$N MIMO and ray tracing.}
+Yahia \emph{et al.}~\cite{yahia2022mimo} simulated a 2$\times$2 MIMO
+V2V-VLC system using dual-transmitter headlight configurations and
+OpticStudio ray tracing, quantifying the channel cross-talk under
+clear, rain, and fog conditions. The results show that zero-forcing (ZF)
+spatial demultiplexing is adequate in clear weather but degrades as
+weather reduces the rank of the channel matrix.
+
+\paragraph{MIMO-NOMA.}
+The combination of MIMO with non-orthogonal multiple access (NOMA) is a
+powerful approach for V2V-VLC. In \cite{mimonoma2025v2v}, a 2$\times$2
+MIMO system uses power-domain NOMA with successive interference
+cancellation (SIC), DCO-OFDM for bandwidth efficiency, and a novel
+normalized gain difference power allocation (NGDPA) scheme. The reported
+throughput improvement is 20\% over OFDMA. A related beamforming study
+\cite{vlcNoma2023beamforming} applies NOMA with SIC and beamforming in
+the V2V context, showing further gains when the beamformer aligns the
+power-domain layers with the channel's spatial modes.
+
+\paragraph{MIMO survey.}
+Sejan \emph{et al.}~\cite{sejan2023survey} provide a comprehensive
+survey of MIMO-VLC covering the full taxonomy (multiplexing, diversity,
+multi-user), machine-learning methods for channel estimation and
+demodulation, and future trends toward massive MIMO and intelligent
+reflecting surfaces.
+
+\subsection{Heterogeneous Fusion ($\rp{10}$)}
+\label{sec:rp10}
+
+Pure OCC links are brittle: they fail in direct sunlight, in heavy fog,
+and when the camera's view is fully obstructed. Heterogeneous fusion
+combines OCC with a complementary radio technology to provide a robust
+overlay.
+
+\paragraph{OCC/VLC + RF.}
+Okasha \emph{et al.}~\cite{okasha2022hybrid} propose a hybrid car-to-car
+MIMO VLC+RF system in which each vehicle alternates between a 100\,m VLC
+hop and a 200\,m RF hop, supporting up to 5 relay hops. The VLC hop
+achieves four times the throughput of the RF hop when the optical link
+is available, and the RF hop maintains connectivity when it is not.
+
+\paragraph{OCC/BLE and OCC/WiFi.}
+In indoor IoT scenarios, fusing OCC with Bluetooth Low Energy (BLE) or
+WiFi provides seamless handover: OCC delivers high-rate downlink data to
+a smartphone camera while BLE/WiFi handles the low-rate uplink and
+control channel. This split is natural because smartphones lack an
+uplink light source suitable for communication.
+
+\paragraph{6G and IEEE 802.15.7a.}
+The IEEE 802.15.7a-2024 amendment (Section~\ref{sec:standard})
+formalizes OCC as a PHY within the short-range optical wireless
+standard, providing the interoperability layer needed for heterogeneous
+6G networks. The standard's relaying mechanism enables an OCC link to
+hand off to a neighbouring OCC or RF node, implementing the fusion
+architectures above in a standardized way.
+
+% =============================================================================
+\section{Application Layer}
+\label{sec:applications}
+
+\subsection{Vehicular Communication: V2V, V2I, and ITS ($\rp{11}$)}
+\label{sec:rp11}
+
+Vehicular visible light communication is the flagship application of
+OCC. Yamazato \emph{et al.}~\cite{yamazato2014vehicular} laid the
+foundation by demonstrating V2V and V2I links using vehicle LED
+headlights and taillights, highlighting the road-surface reflection
+channel that naturally arises in urban driving. Aly \emph{et al.}
+\cite{aly2022vehicular} improved robustness with selection combining
+receiver diversity, selecting the best of multiple photodetector
+branches to combat the rapid fading of the vehicular channel.
+
+For camera-based receivers, the V2V OCC system of Shirvani \emph{et al.}
+\cite{shirvani2021adaptive} uses a mobile-phone camera pointed at the
+preceding vehicle's taillights, with adaptive thresholding to handle the
+changing channel. The MIMO-NOMA V2V-VLC system
+\cite{mimonoma2025v2v} pushes raw rates higher with
+2$\times$2 spatial multiplexing and power-domain superposition, while
+the hybrid VLC+RF architecture \cite{okasha2022hybrid} extends range
+beyond a single hop. The RIS-ISAC V2X design \cite{risisac2025v2x} adds
+intelligent reflecting surfaces at intersections to maintain coverage
+when buildings block the direct path.
+
+\subsection{Indoor VLP, IoT, and ISAC ($\rp{12}$)}
+\label{sec:rp12}
+
+Beyond vehicles, NLOS-OCC serves indoor visible light positioning (VLP),
+Internet of Things (IoT) sensor connectivity, and integrated sensing and
+communication (ISAC). Indoor VLP leverages the camera's angular
+resolution to estimate the position of an LED beacon from its image,
+achieving sub-metre accuracy even when the beacon is seen only as a
+diffuse reflection on a wall. IoT applications use low-rate OCC to read
+sensor values from LED indicators on appliances, with the smartphone
+camera as the universal reader. ISAC combines the communication function
+with a sensing function (presence detection, gesture recognition) using
+the same LED illumination, an approach that aligns with the RIS-ISAC
+framework of \cite{risisac2025v2x} and the AI-PHY provisions of the
+IEEE 802.15.7a standard.
+
+% =============================================================================
+\section{Emerging Research Directions}
+\label{sec:emerging}
+
+Beyond the twelve research points of the core framework, four emerging
+directions are reshaping the NLOS-OCC landscape. These directions extend
+the framework upward (toward 6G semantic integration), outward (to UAV
+and underwater environments), and inward (to joint sensing-communication
+waveforms). We label them $\rp{13}$--$\rp{16}$ to indicate their
+position as frontier extensions of the five-layer stack.
+
+\subsection{UAV-Mounted OCC ($\rp{13}$)}
+\label{sec:rp13}
+
+Unmanned aerial vehicles (UAVs) equipped with cameras or LED payloads
+open a new deployment axis for OCC. Chang \emph{et al.}
+\cite{chang2026uavocc} demonstrated the first wide-field-of-view (FOV)
+bidirectional UAV-assisted OWC system using the under-sampled phase
+shift on-off keying (UPS-OOK) format and a light-diffusing-fibre
+transmitter that radiates over 360$^\circ$, enabling a hovering UAV to
+serve ground receivers at any azimuth. The long-short-term-memory neural
+network (LSTM-NN) decodes the rolling-shutter pattern from arbitrary
+viewing angles, removing the pointing constraint that burdens
+conventional OCC.
+
+For agricultural IoT, Kondo \emph{et al.} \cite{kondo2024farmocc}
+proposed a drone-based OCC sensor network in which LED panels on ground
+sensor nodes transmit soil-moisture and temperature data to a
+drone-mounted camera. A trajectory-control algorithm reduces total
+flight time by 30\,\% versus a shortest-path baseline, and YOLOv5-based
+LED detection with simple OOK modulation achieves BER $<10^{-3}$ in a
+real-world leaf-mustard farm trial. This paradigm---low-cost,
+radio-silent, infrastructure-free---is attractive for underdeveloped and
+radio-quiet zones.
+
+\subsection{Underwater and Cross-Medium OCC ($\rp{14}$)}
+\label{sec:rp14}
+
+Underwater OCC (UWOCC) inherits the NLOS challenge in an extreme form:
+the water column introduces wavelength-dependent absorption, particulate
+scattering, and turbulence that jointly attenuate and smear the optical
+signal. Hamidnejad and Gholami \cite{hamidnejad2023uwmimoocc} developed
+a comprehensive underwater MIMO OCC channel model that captures these
+effects and showed that spatial modulation---exploiting the camera's
+ability to resolve multiple LED transmitters---retains its throughput
+advantage even in turbid water.
+
+At the air-water interface, Tsai \emph{et al.} \cite{tsai2024uavwatertoair}
+combined the UAV and underwater themes: a UAV-mounted camera receives
+OCC signals transmitted from an underwater source, crossing the wavy,
+cloudy water surface. An LSTM-NN mitigates the surface-fluctuation-induced
+link outage, demonstrating that cross-medium NLOS OCC---from a submerged
+sensor to an aerial camera---is feasible. This opens paths for
+autonomous-underwater-vehicle (AUV) telemetry retrieval without
+recovering the vehicle to the surface.
+
+\subsection{Semantic Optical Communication and AI-Native 6G ($\rp{15}$)}
+\label{sec:rp15}
+
+Semantic communication shifts the fidelity criterion from bit-level
+reconstruction to task-relevant meaning, trading redundant detail for
+robustness. For underwater image transmission, Nennouche \emph{et al.}
+\cite{nennouche2025semanticuwoc} proposed a variational-autoencoder
+(VAE) semantic architecture that jointly optimizes source coding and
+channel adaptation; across varying channel conditions the semantic
+approach achieves superior image reconstruction over longer ranges than
+traditional compression plus error-correction coding. The principle
+transfers directly to NLOS-OCC: a semantic encoder can prioritize
+safety-critical vehicular messages or structural-inspection features,
+transmitting only the meaning-bearing content that the degraded NLOS
+channel can support.
+
+At the architectural level, Bostan \cite{bostan2026crosslayer} surveyed
+cross-layer AI-native 6G designs that integrate semantic communication,
+ISAC, RIS, and optical wireless communication (OWC) as complementary
+programmable physical-layer technologies. The five-domain reference
+architecture---physical, control/user-plane, edge-intelligence,
+AI-native orchestration, and semantic/task---positions OWC (including
+OCC) as a short-range, high-capacity, interference-free physical layer
+that semantic encoders can exploit when RF bands are congested. For
+NLOS-OCC this means the camera receiver may eventually feed a semantic
+decoder that extracts task-level information directly from the striped
+image, bypassing the bit-level pipeline entirely.
+
+\subsection{Retroreflective Optical ISAC ($\rp{16}$)}
+\label{sec:rp16}
+
+Integrated sensing and communication (ISAC) over the optical band is a
+rising 6G theme. Retroreflective optical ISAC (RO-ISAC) pairs an
+interrogating transceiver with a passive corner-cube retroreflector
+(CCR) that returns light along the incident path, enhancing the
+reflected signal strength that is the Achilles' heel of NLOS links. Du
+\emph{et al.} \cite{du2025roisac} designed a flexible waveform embedding
+an OFDM data signal within a maximum-length-sequence (MLS) sensing
+frame, jointly delivering communication and ranging/sensing on a single
+optical carrier. The CCR's strong back-reflection relaxes the NLOS power
+budget, and the OFDM-MLS embedding avoids the separate-sensor overhead
+of conventional ISAC. For NLOS-OCC this is significant: a retroreflector
+placed on a vehicle or infrastructure element can return enough light
+for a camera to decode both the data and a sensing measurement (range,
+velocity) from a single captured frame, merging $\rp{1}$ channel
+characterization with $\rp{12}$ ISAC in one physical mechanism.
+
+% =============================================================================
+\section{The IEEE 802.15.7a-2024 Standard}
+\label{sec:standard}
+
+The IEEE 802.15.7a-2024 amendment~\cite{ieee802157a2024}, approved
+2024-12-11 and published 2025-02-14, defines PHY~VII---a dedicated OCC
+physical layer with seven modes designed to span the full range of
+applications from low-rate IoT to high-rate vehicular communication:
+
+\begin{enumerate}
+  \item \textbf{RS-OFDM} --- Reed-Solomon outer code with OFDM, up to
+    9.6\,Mbps, the highest-rate mode.
+  \item \textbf{MIMO-COOK} --- MIMO with colour-orthogonal OOK, using
+    the R/G/B channels as independent streams.
+  \item \textbf{O-NOMA} --- Optical NOMA with power-domain
+    superposition and SIC, supporting multi-user access on a single
+    optical channel.
+  \item \textbf{MIMO-OOK} --- Spatial-multiplexing MIMO with per-LED
+    OOK, the camera resolving the LEDs by position.
+  \item \textbf{HOOK-OFDM} --- Hybrid OOK with OFDM, combining the
+    robustness of OOK with the spectral efficiency of OFDM.
+  \item \textbf{HS2PSK-OFDM} --- Hybrid S2-PSK (spatial two-phase shift
+    keying) with OFDM, a spatial-colour hybrid.
+  \item \textbf{BPPM} --- Binary pulse position modulation, the most
+    robust mode for low-SNR NLOS channels.
+\end{enumerate}
+
+The standard targets a 200\,m communication range and 350\,km/h mobility,
+encompassing highway V2V scenarios. Two forward-looking provisions are
+notable: an \emph{AI-PHY} framework that allows machine-learning-based
+transceiver components (codifying the deep-learning approaches of
+$\rp{5}$ within the standard), and a \emph{relaying mechanism} that
+enables multi-hop OCC links---the standardized counterpart of the
+hybrid VLC+RF fusion in \cite{okasha2022hybrid}. The base
+standard~\cite{ieee8021572018} defines PHY~I--III (VLC with
+photodiode receivers) and PHY~IV--VI (OCC), against which the amendment
+is defined.
+
+% =============================================================================
+\section{Open Challenges and a Prioritized Roadmap}
+\label{sec:roadmap}
+
+The literature reveals a clear dependency chain:
+$\rp{1}\rightarrow\rp{4}/\rp{6}\rightarrow\rp{9}\rightarrow\rp{11}$.
+Accurate channel models ($\rp{1}$) define the signal characteristics
+that recovery algorithms ($\rp{4}$, $\rp{6}$) must handle; recovery
+performance determines whether MIMO and network-level techniques
+($\rp{9}$) can operate on the recovered symbols; and the network layer
+enables the applications ($\rp{11}$) that justify the effort. We
+prioritize the research points accordingly.
+
+\begin{table}[t]
+\centering
+\caption{Prioritized research roadmap.}
+\label{tab:roadmap}
+\small
+\begin{tabular}{l l l}
+\toprule
+\textbf{Horizon} & \textbf{RPs} & \textbf{Rationale} \\
+\midrule
+Near-term & $\rp{4},\rp{7},\rp{12}$ & Denoising + smartphone = deployable demos \\
+Mid-term  & $\rp{1},\rp{5},\rp{9},\rp{11}$ & Channel + DL + MIMO $\Rightarrow$ V2X \\
+Long-term & $\rp{6},\rp{8},\rp{10}$ & Event cameras, RIS, 6G fusion \\
+Frontier  & $\rp{13},\rp{14},\rp{15},\rp{16}$ & UAV, underwater, semantic 6G, RO-ISAC \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Near-term ($\rp{4}, \rp{7}, \rp{12}$).}
+The fastest path to a deployable NLOS-OCC demonstration combines
+adaptive thresholding ($\rp{4}$) with a smartphone receiver ($\rp{7}$)
+in an indoor IoT or VLP scenario ($\rp{12}$). The required components
+exist; the work is integration, robustness testing, and API-level
+access to the RAW sensor stream (as demonstrated by
+Xiao \emph{et al.}~\cite{winklink2024}, whose two-stage DNN achieves
+robust demodulation behind complex, unseen backgrounds).
+
+\paragraph{Mid-term ($\rp{1}, \rp{5}, \rp{9}, \rp{11}$).}
+The vehicular use case ($\rp{11}$) demands accurate NLOS channel models
+($\rp{1}$), deep-learning recovery robust to motion and weather
+($\rp{5}$), and MIMO multiplexing for adequate throughput ($\rp{9}$).
+The IEEE 802.15.7a modes provide the interoperability layer; the
+research challenge is closing the gap between laboratory demonstrations
+and the 200\,m / 350\,km/h targets of the standard.
+
+\paragraph{Long-term ($\rp{6}, \rp{8}, \rp{10}$).}
+Event cameras ($\rp{6}$) dissolve the sampling bottleneck but require a
+fundamentally new processing stack; RIS ($\rp{8}$) adds coverage but
+introduces control-plane complexity; and heterogeneous 6G fusion
+($\rp{10}$) requires cross-layer orchestration of OCC, RF, and sensing.
+These are the directions with the highest potential payoff and the
+highest uncertainty.
+
+\paragraph{Frontier ($\rp{13}, \rp{14}, \rp{15}, \rp{16}$).}
+Four emerging directions extend NLOS-OCC beyond its terrestrial,
+bit-level origins. UAV-mounted OCC ($\rp{13}$) \cite{chang2026uavocc,
+kondo2024farmocc} adds a mobile aerial receiver that can serve
+infrastructure-free sensor networks; the challenge is trajectory
+optimization and wide-FOV optics. Underwater and cross-medium OCC
+($\rp{14}$) \cite{hamidnejad2023uwmimoocc, tsai2024uavwatertoair} must
+contend with wavelength-dependent absorption and the turbulent
+air-water interface, but enables AUV telemetry and ocean-IoT links.
+Semantic optical communication ($\rp{15}$)
+\cite{nennouche2025semanticuwoc, bostan2026crosslayer} reframes the
+receiver as a meaning extractor rather than a bit decoder, trading
+fidelity for task-level robustness---a natural fit for the
+bandwidth-limited NLOS channel. Retroreflective optical ISAC
+($\rp{16}$) \cite{du2025roisac} merges communication and sensing on a
+single optical carrier using passive retroreflectors, directly
+addressing the NLOS power-budget deficit. These directions are at the
+concept-to-prototype stage; their convergence with the core framework
+will define the next generation of NLOS-OCC research.
+
+\paragraph{Cross-cutting challenges.}
+Three issues cut across all horizons: (i) \emph{training data} for
+deep-learning NLOS-OCC is scarce and expensive to collect, motivating
+synthetic data generation via ray tracing and GAN-based augmentation;
+(ii) \emph{synchronization} between the LED transmitter and the camera
+receiver remains non-trivial, especially under motion, and
+LightSync~\cite{lightsync2013}-style ambient-light synchronization
+deserves renewed attention; and (iii) \emph{standardization compliance}
+---ensuring that research prototypes can interoperate under the
+802.15.7a-2024 framework---will determine whether the field's advances
+translate into deployed systems.
+
+% =============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+Non-Line-of-Sight Optical Camera Communication sits at the intersection
+of optical wireless, computational imaging, and mobile computing. Its
+core challenge---recovering MHz-modulated data from a reflection-challenged,
+ambient-light-flooded, 30-fps image stream---has been attacked from
+complementary directions: pilot-aided channel modelling and coding at
+the physical layer; U-Net and GAN-based deep-learning recovery at the
+signal layer; learning-based smartphone demodulation at the hardware layer;
+MIMO-NOMA and hybrid RF fusion at the network layer; and event cameras
+that rethink the sensing primitive itself. The IEEE 802.15.7a-2024
+standard now provides the interoperability framework, and the
+dependency chain $\rp{1}\rightarrow\rp{4}/\rp{6}\rightarrow\rp{9}
+\rightarrow\rp{11}$ identifies where the next advances must come from.
+Four emerging directions---UAV-mounted OCC ($\rp{13}$), underwater and
+cross-medium OCC ($\rp{14}$), semantic optical communication toward
+AI-native 6G ($\rp{15}$), and retroreflective optical ISAC
+($\rp{16}$)---extend the framework to aerial, aquatic, semantic, and
+joint-sensing frontiers. The near-term opportunity is the smartphone-based indoor demo; the
+mid-term prize is the vehicular V2X link at the standard's 200\,m /
+350\,km/h target; and the long-term frontier is the event-camera-equipped,
+RIS-assisted, 6G-fused, semantically-aware NLOS-OCC network spanning
+air, water, and ground.
+
+% =============================================================================
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}

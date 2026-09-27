@@ -1,0 +1,208 @@
+% =============================================================================
+% event_nlos_refs.bib — Bibliography for Event-Camera NLOS Communication Survey
+% Compiled: 2026-09-27
+% Total entries: 18
+% =============================================================================
+
+% --- Foundational Event Camera Hardware ---
+
+@article{lichtsteiner2008dvs,
+  author       = {Lichtsteiner, Patrick and Posch, Christoph and Delbruck, Tobi},
+  title        = {A 128$\times$128 120 {dB} 15~$\mu$s Latency Asynchronous Temporal Contrast Vision Sensor},
+  journal      = {IEEE Journal of Solid-State Circuits},
+  year         = {2008},
+  volume       = {43},
+  number       = {2},
+  pages        = {566--576},
+  doi          = {10.1109/JSSC.2007.914337},
+  note         = {First commercial DVS (DVS128); 120 dB dynamic range, 15 us latency, 128x128 pixels; foundational hardware for all event-based OCC},
+  keywords     = {DVS, event camera, hardware, foundational}
+}
+
+@article{brandli2014davis240,
+  author       = {Brandli, Christian and Berner, Raphael and Yang, Minh and Liu, Shih-Chii and Delbruck, Tobi},
+  title        = {A 240$\times$180 130 {dB} 3~$\mu$s Latency Global Shutter Spatiotemporal Vision Sensor},
+  journal      = {IEEE Journal of Solid-State Circuits},
+  year         = {2014},
+  volume       = {49},
+  number       = {10},
+  pages        = {2333--2341},
+  doi          = {10.1109/JSSC.2014.2342715},
+  note         = {DAVIS240: 240x180 pixels, 130 dB, 3 us latency; adds global-shutter frames alongside events},
+  keywords     = {DAVIS, event camera, hardware}
+}
+
+@inproceedings{son2017samsungdvs,
+  author       = {Son, Bongki and Suh, Yunjae and Kim, Sungho and Jung, Heejae and Kim, Jun-Seok and Shin, Changwoo},
+  title        = {A 640$\times$480 Dynamic Vision Sensor with a 9~$\mu$m Pixel and 300~{Meps} Address-Event Representation},
+  booktitle    = {2017 IEEE International Solid-State Circuits Conference (ISSCC)},
+  year         = {2017},
+  publisher    = {IEEE},
+  doi          = {10.1109/ISSCC.2017.7870263},
+  note         = {Samsung VGA DVS: 640x480, 9um pixel, 300 Meps; enabled higher-resolution event-OCC},
+  keywords     = {DVS, Samsung, VGA, hardware, ISSCC}
+}
+
+% --- Stage 1: Proof-of-Concept Event-OCC (2017-2018) ---
+
+@inproceedings{perez2017eventocc,
+  author       = {Perez-Ramirez, Joan and Bonilla-Illescas, Pablo and Rabadan, Jose and Perez-Jimenez, Rafael},
+  title        = {Event-Based Camera Communication for Visible Light Information Transmission},
+  booktitle    = {Proceedings of the International Conference on Transparent Optical Networks (ICTON)},
+  year         = {2017},
+  publisher    = {IEEE},
+  note         = {First event-OCC demonstration: 500 bit/s over 5 m with BER < 1e-4 using OOK and DVS receiver},
+  keywords     = {event-OCC, first, OOK, DVS, 500 bps, 5m}
+}
+
+@inproceedings{shen2018eventocc,
+  author       = {Shen, Yu and Wang, Zheng and Xu, Liang and Liu, Xun and Zheng, Xiaolin},
+  title        = {Event-Based Optical Camera Communication for High-Speed Visible Light Communication},
+  booktitle    = {Proceedings of the Asia Communications and Photonics Conference (ACP)},
+  year         = {2018},
+  publisher    = {IEEE},
+  note         = {16 kbit/s at 10 m using inverse pulse position modulation (i-PPM) and frequency shift keying (FSK); first multi-level event-OCC},
+  keywords     = {event-OCC, i-PPM, FSK, 16 kbps, 10m}
+}
+
+% --- Stage 2: Spatial Encoding and Beacon Systems (2022-2024) ---
+
+@inproceedings{wang2022beacon,
+  author       = {Wang, Ziwei and Ng, Yonhon and Henderson, Jack and Mahony, Robert},
+  title        = {Smart Visual Beacons with Asynchronous Optical Communications using Event Cameras},
+  booktitle    = {IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
+  year         = {2022},
+  publisher    = {IEEE},
+  note         = {Smart visual beacon architecture: LED modulation + event camera demodulation; 100 m at 500 bit/s with zero bit errors; quantitative distance-rate-accuracy tradeoff},
+  keywords     = {event-OCC, beacon, IROS, 100m, LED, spatial}
+}
+
+@article{aranda2024npulse,
+  author       = {Aranda, Jaime and Guerra, Vicente and Rabad{\'a}n, Jos{\'e} and P{\'e}rez-Jim{\'e}nez, Rafael},
+  title        = {Enhancing Computational Efficiency in Event-Based Optical Camera Communication Using {N-Pulse} Modulation},
+  journal      = {Electronics},
+  year         = {2024},
+  volume       = {13},
+  number       = {17},
+  pages        = {3438},
+  publisher    = {MDPI},
+  doi          = {10.3390/electronics13173438},
+  note         = {N-pulse modulation: adapts encoding to event camera characteristics; significantly reduces demodulation complexity vs. OOK/PPM},
+  keywords     = {N-pulse, modulation, event-OCC, efficiency, Electronics}
+}
+
+@inproceedings{vonarnim2024dynamic,
+  author       = {von Arnim, Christoph and Sch{\"o}ll, Michael and Pfrommer, Julius and Stork, Wolfgang},
+  title        = {Dynamic Event-Based Optical Camera Communication in Changing Environments},
+  booktitle    = {Proceedings of the Workshop on Optical Wireless Communications (OWC)},
+  year         = {2024},
+  publisher    = {IEEE},
+  note         = {Framework for dynamic event-OCC environments: 2.5 kbit/s with 94\% message accuracy at 0.5 m; handles motion and ambient changes},
+  keywords     = {dynamic, event-OCC, 2.5 kbps, environment}
+}
+
+% --- Stage 3: NLOS Event Camera Communication (2025) ---
+
+@article{nishar2025nlosneuromorphic,
+  author       = {Mohamed Nishar, Abbaas Alif and Marefat, Alireza and Ashok, Ashwin},
+  title        = {Non Line-of-Sight Optical Wireless Communication using Neuromorphic Cameras},
+  journal      = {Proceedings of the International Conference on Embedded Wireless Systems and Networks (EWSN)},
+  year         = {2025},
+  pages        = {148--159},
+  publisher    = {ACM},
+  note         = {arXiv:2503.11226; FIRST NLOS event-camera OCC: passive reflections from everyday objects; OOK + adaptive N-pulse; lighter glossy surfaces better; ~20 kHz effective sampling, 120 dB DR},
+  keywords     = {NLOS, neuromorphic, event camera, EWSN, arXiv, first NLOS}
+}
+
+@article{su2025motionaware,
+  author       = {Su, Hang and Gao, Ling and Liu, Tao and Kneip, Laurent},
+  title        = {Motion-Aware Optical Camera Communication with Event Cameras},
+  journal      = {IEEE Robotics and Automation Letters (RAL)},
+  year         = {2025},
+  volume       = {10},
+  number       = {3},
+  publisher    = {IEEE},
+  doi          = {10.1109/LRA.2024.3517292},
+  note         = {arXiv:2412.00816; dynamic QR-code spatial encoding: 114 kbit/s static, 1 cm localization at 1\% BER under camera motion; event camera eliminates motion blur and frame sync issues},
+  keywords     = {motion-aware, event-OCC, RAL, 114 kbps, QR code, spatial, arXiv}
+}
+
+% --- Stage 4: Long-Range and Specialized Event-OCC (2025-2026) ---
+
+@article{sumino2025longrange,
+  author       = {Sumino, Miu and Ishii, Mayu and Kaizu, Shun and Hisano, Daisuke and Nakayama, Yu},
+  title        = {Experimental Demonstration of Event-Based Optical Camera Communication in Long-Range Outdoor Environment},
+  journal      = {arXiv preprint arXiv:2510.14266},
+  year         = {2025},
+  doi          = {10.48550/arXiv.2510.14266},
+  note         = {First long-range outdoor event-OCC: OOK + toggle demodulation + digital PLL; BER < 1e-3 at 200m/60kbps and 400m/30kbps; published at GLOBECOM 2025},
+  keywords     = {long-range, outdoor, event-OCC, OOK, toggle, PLL, 200m, 400m, arXiv}
+}
+
+@article{sumino2025eim,
+  author       = {Sumino, Miu and Ishii, Mayu and Kaizu, Shun and Hisano, Daisuke and Nakayama, Yu},
+  title        = {Event Interval Modulation: A Novel Scheme for Event-Based Optical Camera Communication},
+  journal      = {arXiv preprint arXiv:2510.14245},
+  year         = {2025},
+  doi          = {10.48550/arXiv.2510.14245},
+  note         = {Event Interval Modulation (EIM): modulates information in the time intervals between events; 28 kbps at 10m, 8.4 kbps at 50m; first modulation designed specifically for event cameras},
+  keywords     = {EIM, event interval modulation, event-OCC, novel, arXiv}
+}
+
+@article{nardo2026longrange,
+  author       = {Nardo, Francesco and Kr{\"o}tz, Peter and Barrios, Ricardo and Randel, Sebastian},
+  title        = {Real-Time Event-Based Optical Camera Communication at 80~kbit/s over a 320~m Outdoor Link with 120$^\circ$ Field-of-View},
+  journal      = {arXiv preprint arXiv:2609.29776},
+  year         = {2026},
+  doi          = {10.48550/arXiv.2609.29776},
+  note         = {80 kbit/s at 320m outdoor, 106 kbit/s short-range; multi-node 240 kbit/s aggregate; 8b/10b + OOK-NRZ + digital PLL; Prophesee EVK4 / Sony IMX636; 120 deg FoV fish-eye},
+  keywords     = {long-range, 320m, 80 kbps, multi-node, 8b/10b, PLL, Prophesee, arXiv}
+}
+
+@article{fang2026underwater,
+  author       = {Fang, Cheng-Wei and Xie, Yapeng and Chang, Yun-Han and Chow, Chi-Wai and Wang, Ke},
+  title        = {An Event-Based Camera-Enabled Underwater Optical Integrated Sensing and Communication System},
+  journal      = {Frontiers in Marine Science},
+  year         = {2026},
+  volume       = {13},
+  publisher    = {Frontiers},
+  doi          = {10.3389/fmars.2026.1938813},
+  note         = {Event-camera underwater ISAC: combines communication and sensing for underwater unmanned vehicles; extends event-OCC to UWOCC domain},
+  keywords     = {underwater, event camera, ISAC, UWOCC, marine}
+}
+
+@article{munoz2026miso,
+  author       = {Mu{\~n}oz, Fernanda Borja and Aranda Cubillo, Jaime and Guerra, Vicente and Azurdia-Meza, C{\'e}sar A. and Rabad{\'a}n, Jos{\'e} and P{\'e}rez-Jim{\'e}nez, Rafael},
+  title        = {Design and Implementation of a Feedback-Aware {MISO} Event-Based Optical Camera Communication System},
+  journal      = {IEEE Photonics Technology Letters},
+  year         = {2026},
+  publisher    = {IEEE},
+  doi          = {10.1109/LPT.2026.3692381},
+  note         = {Feedback-aware MISO event-OCC: LED array transmitter + event camera receiver; near-real-time operation via event-driven sensing and lightweight demodulation},
+  keywords     = {MISO, feedback, event-OCC, LED array, real-time}
+}
+
+@article{aranda2025pulseshaped,
+  author       = {Aranda Cubillo, Jaime and Guerra, Vicente and Azurdia-Meza, C{\'e}sar A. and Rabad{\'a}n, Jos{\'e} and Perez-Jim{\'e}nez, Rafael},
+  title        = {Evaluation of Pulse-Shaped Waveform Modulation for Event Camera-Based {OCC} Systems},
+  journal      = {Electronics Letters},
+  year         = {2025},
+  publisher    = {IET},
+  note         = {Pulse-shaped waveform modulation exploiting event camera high temporal resolution and sensitivity; evaluates throughput per distance and symbol period},
+  keywords     = {pulse-shaped, waveform, event-OCC, Electronics Letters}
+}
+
+% --- Supporting: NLOS Channel and Reflection Context ---
+
+@article{he2023nlosmodel,
+  author       = {He, Zhengye and Chen, Jian and Yu, Chang-Yuan},
+  title        = {Simplified Model for Non-Line-of-Sight Optical Camera Communication with a Simple Patterned Reflective Surface},
+  journal      = {Applied Optics},
+  year         = {2023},
+  volume       = {62},
+  number       = {33},
+  pages        = {8837--8845},
+  publisher    = {Optica Publishing Group},
+  note         = {Mathematical NLOS-OCC model with patterned reflective surface; provides channel characterization foundation for NLOS event-camera work},
+  keywords     = {NLOS, model, reflective surface, OCC, Applied Optics}
+}

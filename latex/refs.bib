@@ -1,0 +1,443 @@
+% =============================================================================
+% refs.bib — Bibliography for NLOS-OCC Survey
+% Non-Line-of-Sight Optical Camera Communication
+% Compiled: 2026-09-22
+% Total entries: 33 (27 original + 6 extended-direction)
+%   - 7 top-tier conference/journal papers (MobiCom x3, MobiSys x3, TMC x1)
+%   - 18 journal/conference papers
+%   - 2 IEEE standards
+%   - 6 extended research directions (RP13-RP18)
+% =============================================================================
+
+% =============================================================================
+% Part A: Top-Tier Conference/Journal Papers (MobiCom / MobiSys / TMC)
+% =============================================================================
+
+@inproceedings{winklink2024,
+  author       = {Xiao, Rui and Zhao, Leqi and Qian, Feng and Yang, Lei and Han, Jinsong},
+  title        = {Practical Optical Camera Communication Behind Unseen and Complex Backgrounds},
+  booktitle    = {Proceedings of the 22nd ACM International Conference on Mobile Systems, Applications, and Services (MobiSys)},
+  year         = {2024},
+  publisher    = {ACM},
+  note         = {Two-stage DNN with context-aware demodulation; operates at -20 dB SNR, +5.8 dB SNR gain over baselines, 5.5x baseline distance (11 m with 10 W LED); trained on synthesized data, tested in 12 real environments; robust to moving devices. CC BY-SA 4.0},
+  keywords     = {OCC, smartphone, deep learning, NLOS, two-stage DNN, MobiSys}
+}
+
+@article{ganocc2026,
+  author       = {Liu, Wenping and Deng, Qian and Yang, Zheng and Xiao, Fu and Zhou, Bing-Peng and Geng, Xuewen},
+  title        = {Integrated Optical Camera Communication and Scene Sensing Based on Generative Adversarial Networks},
+  journal      = {IEEE Transactions on Mobile Computing (TMC)},
+  year         = {2026},
+  month        = jun,
+  publisher    = {IEEE},
+  note         = {GANOCCAS: GAN framework for reflected OCC---generator reconstructs background, discriminator extracts stripe sequence via joint loss; BER < 0.04 at SNR < -20 dB (50\%+ lower than WinkLink), SSIM > 0.95, scene recognition accuracy 97.5\%},
+  keywords     = {GAN, background separation, stripe extraction, OCC, scene sensing, reflected OCC, TMC}
+}
+
+@inproceedings{passivevlc2017,
+  author       = {Xu, Xieyang and Shen, Yang and Yang, Junrui and Xu, Chenren and Shen, Guobin and Chen, Guojun and Ni, Yunzhen},
+  title        = {{PassiveVLC}: Enabling Practical Visible Light Backscatter Communication for Battery-free {IoT} Applications},
+  booktitle    = {Proceedings of the 23rd ACM International Conference on Mobile Computing and Networking (MobiCom)},
+  year         = {2017},
+  publisher    = {ACM},
+  note         = {Passive backscatter VLC using ambient light as carrier},
+  keywords     = {passive, backscatter, VLC, ambient light, MobiCom}
+}
+
+@inproceedings{lightsync2013,
+  author       = {Hu, Wenjun and Gu, Haohao and Pu, Qifan},
+  title        = {{LightSync}: Passive Clock Synchronization Using Ambient Light},
+  booktitle    = {Proceedings of the 19th ACM International Conference on Mobile Computing and Networking (MobiCom)},
+  year         = {2013},
+  publisher    = {ACM},
+  note         = {Passive inter-device clock synchronization via ambient visible light},
+  keywords     = {clock synchronization, ambient light, VLC, MobiCom}
+}
+
+@inproceedings{pixnet2010,
+  author       = {Perli, Surendra and Ahmed, Nabeel and Katabi, Dina},
+  title        = {{PixNet}: {LED}-to-Image Communication Using Spatial Modulation},
+  booktitle    = {Proceedings of the 16th ACM International Conference on Mobile Computing and Networking (MobiCom)},
+  year         = {2010},
+  publisher    = {ACM},
+  note         = {2D spatial modulation for screen-to-camera communication},
+  keywords     = {spatial modulation, LED array, MIMO-OCC, MobiCom}
+}
+
+@inproceedings{cobra2012,
+  author       = {Hao, Tian and Zhou, Rui and Xing, Guoliang},
+  title        = {{COBRA}: Color Barcode Streaming for Smartphone Data Communication},
+  booktitle    = {Proceedings of the 10th ACM International Conference on Mobile Systems, Applications, and Services (MobiSys)},
+  year         = {2012},
+  publisher    = {ACM},
+  note         = {CSK (Color Shift Keying) color barcode streaming for smartphone OCC},
+  keywords     = {CSK, color barcode, smartphone, OCC, MobiSys}
+}
+
+@inproceedings{screencamera2015,
+  author       = {Li, Tianxing and An, Cong and Xiao, Xinyu},
+  title        = {Real-Time Screen-Camera Communication Behind Any Scene},
+  booktitle    = {Proceedings of the 13th ACM International Conference on Mobile Systems, Applications, and Services (MobiSys)},
+  year         = {2015},
+  publisher    = {ACM},
+  note         = {Screen-camera OCC through glass occlusion (quasi-NLOS)},
+  keywords     = {screen-camera, glass occlusion, NLOS, MobiSys}
+}
+
+% =============================================================================
+% Part B: Journal and Conference Papers
+% =============================================================================
+
+% --- RP1: Channel Modeling ---
+
+@inproceedings{dong2023barker,
+  author       = {Dong, Bo and Wang, Zhengliang and He, Yaru and Yang, Aiying and Qiao, Yaojun},
+  title        = {Long Distance {NLOS} {OCC} Based on the {Barker} Code Pilot},
+  booktitle    = {Optoelectronics and Communications Conference (OECC)},
+  year         = {2023},
+  publisher    = {IEEE},
+  doi          = {10.1109/OECC56963.2023.10209585},
+  note         = {DDBP algorithm, 5 m NLOS, Barker code pilot, 7\% FEC threshold},
+  keywords     = {NLOS-OCC, Barker code, DDBP, pilot, OECC}
+}
+
+@article{chen2021pilot,
+  author       = {Chen, Wei and Chi, Nan and Li, Xuan},
+  title        = {{NLOS} {OCC} Aided by a Pilot},
+  journal      = {Optics Letters},
+  year         = {2021},
+  publisher    = {Optica Publishing Group},
+  doi          = {10.1364/OL.431932},
+  note         = {PSLE + EVC, 2.5 m NLOS, heterogeneous background light},
+  keywords     = {NLOS-OCC, pilot, PSLE, EVC, Optics Letters}
+}
+
+@inproceedings{liu2023vehicular,
+  author       = {Liu, Yucong and Dang, Anhong},
+  title        = {A General Vehicular Visible Light Communication {MIMO} Channel Model},
+  booktitle    = {International Conference on Wireless, Optics and mmWave Communications (ICWOC)},
+  year         = {2023},
+  publisher    = {IEEE},
+  doi          = {10.1109/ICWOC57905.2023.10200975},
+  note         = {3D IS-GBSM model, vehicular VLC MIMO channel, weather visibility, birth-death process},
+  keywords     = {vehicular VLC, MIMO channel, IS-GBSM, ICWOC}
+}
+
+% --- RP2: Modulation and Coding ---
+
+@inproceedings{mimoufsook2013,
+  author       = {Roberts, Richard D.},
+  title        = {A {MIMO} Protocol for Camera Communications ({CamCom}) Using Undersampled Frequency Shift {ON-OFF} Keying ({UFSOOK})},
+  booktitle    = {IEEE Global Communications Conference (GLOBECOM)},
+  year         = {2013},
+  publisher    = {IEEE},
+  note         = {Undersampled Frequency Shift OOK extended to MIMO OCC},
+  keywords     = {UFSOOK, MIMO, undersampled modulation, OCC, GLOBECOM}
+}
+
+@article{lu2016raptor,
+  author       = {Lu, Min and Liu, Linyan and Hranilovic, Steve},
+  title        = {Raptor-Coded Free-Space Optical Communications Experiment},
+  journal      = {Journal of Optical Communications and Networking (JOCN)},
+  year         = {2016},
+  publisher    = {Optica Publishing Group},
+  note         = {Raptor fountain codes for FSO channel fading mitigation},
+  keywords     = {Raptor code, fountain code, FSO, rateless, JOCN}
+}
+
+@inproceedings{pernice2016raptorq,
+  author       = {Pernice, Riccardo and And{\`o}, Andrea and Parisi, Antonino and Cino, Alfonso C. and Busacca, Alessandro C.},
+  title        = {Experimental Investigation of a Laboratory Indoor Free Space Optics Link under Moderate-to-Strong Turbulence Generation and {RaptorQ} Codes Error Mitigation},
+  booktitle    = {International Conference on Transparent Optical Networks (ICTON)},
+  year         = {2016},
+  publisher    = {IEEE},
+  note         = {RaptorQ code performance under atmospheric turbulence},
+  keywords     = {RaptorQ, turbulence, FSO, ICTON}
+}
+
+% --- RP3/RP4: Noise Suppression and Deep Learning Signal Recovery ---
+
+@article{unet2025nlos,
+  author       = {Ozkan, Cagla and Inan, Tolga},
+  title        = {Bit Segmentation of Non-Line-of-Sight Data in Optical Camera Communication Using {U-Net}},
+  journal      = {Physica Scripta},
+  year         = {2025},
+  publisher    = {IOP Publishing},
+  note         = {U-Net semantic segmentation for pixel-level bit extraction from NLOS reflections},
+  keywords     = {U-Net, NLOS-OCC, bit segmentation, deep learning}
+}
+
+@inproceedings{shirvani2021adaptive,
+  author       = {Shirvani Kordavani, Negar and Gholami, Asghar and Hamidnejad, Ehsan and Masiedi Esfahani, Negar and Ghassemlooy, Zabih},
+  title        = {Experimental Investigation of an Adaptive {V2V} Optical Camera Communications System},
+  booktitle    = {2021 17th International Symposium on Wireless Communication Systems (ISWCS)},
+  year         = {2021},
+  publisher    = {IEEE},
+  address      = {Berlin, Germany},
+  doi          = {10.1109/ISWCS49558.2021.9562186},
+  note         = {Adaptive thresholding for V2V OCC with mobile phone camera receiving LED taillight signals; improved BER under varying ambient-light conditions},
+  keywords     = {adaptive threshold, V2V, OCC, smartphone, ISWCS}
+}
+
+% --- RP5: Event Cameras / Neuromorphic ---
+
+@inproceedings{neuromorphic2025nlos,
+  author       = {Mohamed Nishar, Abbaas Alif and Marefat, Alireza and Ashok, Ashwin},
+  title        = {Non Line-of-Sight Optical Wireless Communication using Neuromorphic Cameras},
+  booktitle    = {European Wireless Sensor Networks Conference (EWSN)},
+  year         = {2025},
+  note         = {arXiv:2503.11226; first application of event camera to NLOS OWC, ~20 kHz effective sampling, 120 dB dynamic range},
+  keywords     = {event camera, neuromorphic, NLOS, OWC, EWSN, arXiv}
+}
+
+@article{event2024motion,
+  author       = {Su, Hang and Gao, Ling and Liu, Tao and Kneip, Laurent},
+  title        = {Motion-Aware Optical Camera Communication with Event Cameras},
+  journal      = {IEEE Robotics and Automation Letters (RAL)},
+  year         = {2024},
+  publisher    = {IEEE},
+  note         = {Event camera for motion-tolerant OCC signal detection; arXiv:2412.00816},
+  keywords     = {event camera, motion-aware, OCC, RAL}
+}
+
+% --- RP8/RP9: RIS and MIMO ---
+
+@misc{risisac2025v2x,
+  author       = {{Author suppressed (Wanfang thesis D04096579); Supervisor: Zhao, Junhui}},
+  title        = {面向车联网的通信感知一体化信号设计研究 ({RIS}-{ISAC} Signal Design for {V2X})},
+  howpublished = {Master's thesis, Wanfang Data (thesis ID D04096579), Information and Communication Engineering},
+  year         = {2025},
+  note         = {RIS-assisted ISAC beamforming: MIMO-ISAC waveform design (Riemannian conjugate gradient + ADMM for PAPR constraints) and RIS-aided beamforming (block coordinate descent, penalty CCCP + Riemannian manifold optimization) minimizing CRB subject to SINR constraints; addresses NLoS coverage and sensing accuracy. Supervisor: Zhao Junhui},
+  keywords     = {RIS, ISAC, V2X, NLoS, beamforming, thesis, Wanfang}
+}
+
+@article{mimonoma2025v2v,
+  author       = {Meghraoui, Aicha and Tayebi, Mohamed L. and Besseghier, Mokhtar and Eldeeb, Hossien B. and Ho, Tu Dac and Vo, Van Nhan and Haas, Harald},
+  title        = {Performance Enhancement of {MIMO-NOMA}-Based {V2V-VLC} Systems Under Realistic Channel Conditions and Environmental Influences},
+  journal      = {IEEE Open Journal of the Communications Society (OJ-COMS)},
+  year         = {2025},
+  volume       = {6},
+  pages        = {10403--10418},
+  publisher    = {IEEE},
+  doi          = {10.1109/OJCOMS.2025.3643949},
+  note         = {2x2 MIMO + NOMA + DCO-OFDM + ZF + NGDPA, 20\% rate improvement over OFDMA; fairness 0.99/0.94 for perfect/imperfect SIC; non-sequential ray-tracing channel model},
+  keywords     = {MIMO, NOMA, V2V, VLC, DCO-OFDM, NGDPA, OJ-COMS}
+}
+
+@article{yahia2022mimo,
+  author       = {Yahia, Selma and Meraihi, Yassine and Gabis, Asma Benmessaoud and Ramdane-Cherif, Amar},
+  title        = {On the Performance of {MIMO} Vehicular Visible Light Communications},
+  journal      = {Intelligent Systems Reference Library (Springer)},
+  year         = {2022},
+  publisher    = {IEEE},
+  note         = {2x2 MIMO V2V-VLC, OpticStudio ray tracing, headlight dual-transmitter, weather effects},
+  keywords     = {MIMO, vehicular VLC, ray tracing, V2V}
+}
+
+@article{okasha2022hybrid,
+  author       = {Okasha, Nermeen M. and Zekry, Abdel Halem A. and Newagy, Fatma A.},
+  title        = {Developing Hybrid Car-to-Car Communication System Based on {MIMO} Visible Light and Radio Frequency},
+  journal      = {EURASIP Journal on Wireless Communications and Networking},
+  year         = {2022},
+  publisher    = {Springer},
+  note         = {VLC 100 m/hop + RF 200 m/hop, up to 5 hops, VLC throughput 4x RF},
+  keywords     = {hybrid, VLC, RF, car-to-car, EURASIP}
+}
+
+@article{sejan2023survey,
+  author       = {Sejan, Mohammad Abrar Shakil and Rahman, Md Habibur and Aziz, Md Abdul and Kim, Dong-Sun and You, Young-Hwan and Song, Hyoung-Kyu},
+  title        = {A Comprehensive Survey on {MIMO} Visible Light Communication: Current Research, Machine Learning and Future Trends},
+  journal      = {Sensors},
+  year         = {2023},
+  volume       = {23},
+  number       = {2},
+  pages        = {739},
+  publisher    = {MDPI},
+  doi          = {10.3390/s23020739},
+  note         = {Comprehensive survey covering MIMO-VLC taxonomy, ML methods, and future trends},
+  keywords     = {MIMO, VLC, survey, machine learning, Sensors}
+}
+
+% --- RP11: V2V/V2I Applications ---
+
+@article{yamazato2014vehicular,
+  author       = {Yamazato, Takaya and Takai, Isamu and Okada, Harris and Fujii, Toshiaki and Yendo, Tatsuhito and Arai, Shunsuke and Andoh, Keita and Harada, Tomohisa and Yasutomi, Kota and Kagawa, Keiichiro and Kawahito, Shoji},
+  title        = {Image-Sensor-Based Visible Light Communication for Automotive Applications},
+  journal      = {IEEE Communications Magazine},
+  year         = {2014},
+  publisher    = {IEEE},
+  note         = {Pioneering work on vehicular VLC using vehicle LED head/tail lights for V2V/V2I},
+  keywords     = {vehicular VLC, V2V, V2I, LED, IEEE CommMag}
+}
+
+@article{aly2022vehicular,
+  author       = {Aly, Basem and Elamassie, Mariam and Uysal, Murat},
+  title        = {Vehicular Visible Light Communication with Selection Combining},
+  journal      = {IEEE Transactions on Vehicular Technology (TVT)},
+  year         = {2022},
+  publisher    = {IEEE},
+  note         = {Selection combining receiver diversity for vehicular VLC},
+  keywords     = {vehicular VLC, selection combining, receive diversity, TVT}
+}
+
+@article{vlcNoma2023beamforming,
+  author       = {Yosef, Seba Adnan and Abdulameer, Lwaa Faisal},
+  title        = {Performance Enhancement of {VLC-NOMA} Employing Beamforming Function Based Vehicle-to-Multivehicle Communication System},
+  journal      = {IETE Journal of Research},
+  year         = {2023},
+  publisher    = {Taylor \& Francis},
+  note         = {VLC-NOMA + beamforming + SIC interference cancellation for V2V},
+  keywords     = {VLC, NOMA, beamforming, V2V, SIC}
+}
+
+% =============================================================================
+% Part C: IEEE Standards
+% =============================================================================
+
+@techreport{ieee802157a2024,
+  author       = {{IEEE Computer Society}},
+  title        = {{IEEE} Standard for Local and Metropolitan Area Networks---Part 15.7: Short-Range Optical Wireless Communications---Amendment 1: Higher Rate, Longer Range Optical Camera Communication ({OCC})},
+  institution  = {IEEE},
+  number       = {IEEE Std 802.15.7a-2024},
+  year         = {2024},
+  month        = dec,
+  note         = {Approved 2024-12-11, Published 2025-02-14. PHY VII: 7 modes (RS-OFDM up to 9.6 Mbps, MIMO-COOK, O-NOMA, MIMO-OOK, HOOK-OFDM, HS2PSK-OFDM, BPPM). 350 km/h mobility, 200 m range, AI-PHY, relaying mechanism},
+  doi          = {10.1109/IEEESTD.2025.10884983},
+  keywords     = {IEEE standard, OCC, PHY VII, RS-OFDM, MIMO, NOMA, AI-PHY, relaying}
+}
+
+@techreport{ieee8021572018,
+  author       = {{IEEE Computer Society}},
+  title        = {{IEEE} Standard for Local and Metropolitan Area Networks---Part 15.7: Short-Range Optical Wireless Communications},
+  institution  = {IEEE},
+  number       = {IEEE Std 802.15.7-2018},
+  year         = {2018},
+  note         = {Base standard: PHY I-III (VLC) and PHY IV-VI (OCC)},
+  keywords     = {IEEE standard, VLC, OCC, base standard}
+}
+
+% =============================================================================
+% Part D: Extended Research Directions (RP13-RP18)
+% =============================================================================
+
+% --- RP13: Underwater OCC ---
+
+@article{chang2026uavocc,
+  author       = {Chang, Yun-Han and Chow, Chi-Wai and Kuo, Hao-Chung},
+  title        = {Wide Field-of-View ({FOV}) and Bidirectional Unmanned-Aerial-Vehicle ({UAV}) Based Optical Wireless Communication ({OWC}) Using Camera},
+  journal      = {IEEE Photonics Journal},
+  year         = {2026},
+  volume       = {18},
+  number       = {4},
+  publisher    = {IEEE},
+  doi          = {10.1109/JPHOT.2026.3710229},
+  note         = {First wide-FOV bidirectional UAV-OCC using UPS-OOK; light-diffusing fiber transmitter for 360-degree coverage; LSTM-NN decoding; enables UAV-to-ground and air-to-water links},
+  keywords     = {UAV, OCC, UPS-OOK, light-diffusing fiber, bidirectional, wide FOV}
+}
+
+@article{kondo2024farmocc,
+  author       = {Kondo, Shinnosuke and Yoshimoto, Naoto and Nakayama, Yu},
+  title        = {Farm Monitoring System with Drones and Optical Camera Communication},
+  journal      = {Sensors},
+  year         = {2024},
+  volume       = {24},
+  number       = {18},
+  pages        = {6146},
+  publisher    = {MDPI},
+  doi          = {10.3390/s24186146},
+  note         = {Drone-mounted camera collecting OOK sensor data from LED panels; YOLOv5 object detection; trajectory control reduces flight time 30\%; BER < 10^-3 in farm field trial},
+  keywords     = {UAV, drone, OCC, agriculture, IoT, sensor network, YOLOv5, OOK}
+}
+
+% --- RP14: Underwater OCC and Water-to-Air Interface ---
+
+@inproceedings{tsai2024uavwatertoair,
+  author       = {Tsai, Ming-Chieh and Chen, Jian-Wen and Chang, Yun-Han and Chow, Chi-Wai and Chang, You-Chia and Yeh, Chien-Hung},
+  title        = {Unmanned Aerial Vehicle ({UAV}) Based Optical Camera Communication ({OCC}) in Water-to-Air Data Transmission},
+  booktitle    = {2024 IEEE Opto-Electronics and Communications Conference (OECC)},
+  year         = {2024},
+  publisher    = {IEEE},
+  note         = {Water-to-air UAV-OCC crossing the air-water interface; LSTM-NN mitigates cloudy and wavy surface fluctuation; demonstrates cross-medium NLOS OCC},
+  keywords     = {underwater OCC, UAV, water-to-air, LSTM, cross-medium}
+}
+
+@article{hamidnejad2023uwmimoocc,
+  author       = {Hamidnejad, Ehsan and Gholami, Asghar},
+  title        = {Developing a Comprehensive Model for Underwater {MIMO} {OCC} System},
+  journal      = {Optics Express},
+  year         = {2023},
+  volume       = {31},
+  number       = {14},
+  pages        = {22784--22798},
+  publisher    = {Optica Publishing Group},
+  note         = {Comprehensive underwater MIMO OCC channel model accounting for absorption, scattering, and turbulence; spatial modulation extends OCC to underwater IoT},
+  keywords     = {underwater OCC, MIMO, channel model, spatial modulation, UWOCC}
+}
+
+% --- RP15: Semantic Optical Communication and AI-Native 6G ---
+
+@article{nennouche2025semanticuwoc,
+  author       = {Nennouche, Mohamed and Khalighi, Mohammad Ali and Dowhuszko, Alexis Alfredo and Merad, Djamal},
+  title        = {Semantic Underwater Optical Wireless Communication Using Variational Autoencoders},
+  journal      = {TechRxiv (preprint)},
+  year         = {2025},
+  publisher    = {TechRxiv / IEEE},
+  doi          = {10.36227/techrxiv.176238231.12597712/v1},
+  note         = {VAE-based semantic communication for underwater image transmission; end-to-end joint source-channel coding; superior reconstruction over longer ranges vs. traditional compression + ECC},
+  keywords     = {semantic communication, underwater OWC, variational autoencoder, JSCC, deep learning}
+}
+
+@article{bostan2026crosslayer,
+  author       = {Bostan, Ionel},
+  title        = {Cross-Layer {AI}-Native Architectures for Sustainable {6G} Networks: Integrating Semantic Communication and Sensing},
+  journal      = {Computer Networks},
+  year         = {2026},
+  volume       = {245},
+  pages        = {112700},
+  publisher    = {Elsevier},
+  doi          = {10.1016/j.comnet.2026.112700},
+  note         = {Cross-layer AI-native 6G architecture integrating SemCom, ISAC, RIS, THz, and OWC; five-domain reference architecture; identifies OWC as complementary programmable physical layer for semantic-aware 6G},
+  keywords     = {semantic communication, 6G, AI-native, ISAC, RIS, OWC, cross-layer, edge intelligence}
+}
+
+% --- RP16: Retroreflective Optical ISAC ---
+
+@article{du2025roisac,
+  author       = {Du, Jia and Chen, Chen and Wang, Deng-Ke and Zeng, Zhi-Hong and Liu, Min and Haas, Harald},
+  title        = {Flexible Waveform Design for {RO-ISAC} Based on {OFDM}-Embedded Maximum Length Sequence},
+  journal      = {IEEE Wireless Communications Letters},
+  year         = {2025},
+  volume       = {14},
+  number       = {10},
+  publisher    = {IEEE},
+  note         = {Retroreflective optical ISAC (RO-ISAC): OFDM-embedded MLS waveform jointly supports communication and sensing; enhanced light reflection via corner-cube retroreflector; 6G optical ISAC},
+  keywords     = {RO-ISAC, retroreflective, optical ISAC, OFDM, MLS, 6G, sensing, corner-cube}
+}
+
+% --- RP4 extension: Manchester coding for turbulence ---
+
+@article{li2026manchester,
+  author       = {Li, Jianfeng and Yang, Yuwei and Liu, Xiaoshuang},
+  title        = {Manchester Coding for Atmospheric Turbulence Mitigation in Optical Camera Communications},
+  journal      = {IEEE Photonics Technology Letters},
+  year         = {2026},
+  volume       = {38},
+  number       = {3},
+  publisher    = {IEEE},
+  note         = {Manchester coding-based demodulation for long-distance rolling-shutter OCC under atmospheric turbulence; transitions-based decoding robust to intensity fluctuations},
+  keywords     = {Manchester coding, atmospheric turbulence, OCC, rolling shutter, long-distance}
+}
+
+% --- RP5 extension: DL equalization for CSK OCC ---
+
+@inproceedings{furukawa2025cskdl,
+  author       = {Furukawa, Yuta and Takikawa, Keisuke and Hisano, Daisuke and Nakayama, Yu and Maruta, Kazuki},
+  title        = {Deep Learning Based Equalization for {CSK} Optical Camera Communication},
+  booktitle    = {2025 IEEE International Symposium on Circuits and Systems (ISCAS)},
+  year         = {2025},
+  publisher    = {IEEE},
+  address      = {London, United Kingdom},
+  doi          = {10.1109/ISCAS56072.2025.11044112},
+  note         = {DL-based equalization compensating CSK constellation distortion from hue shifts and image-sensor internal processing; indoor LED experiment demonstrates fundamental effectiveness},
+  keywords     = {CSK, deep learning, equalization, OCC, constellation, color shift keying}
+}
