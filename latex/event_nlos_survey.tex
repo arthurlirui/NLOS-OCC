@@ -45,30 +45,33 @@
 
 % -----------------------------------------------------------------------------
 \begin{abstract}
-Event cameras (neuromorphic vision sensors, dynamic vision sensors) have
-emerged as a transformative receiver technology for optical camera
-communication (OCC), fundamentally addressing the temporal sampling
-bottleneck that limits conventional frame-based cameras to sub-kHz
-bandwidths. By asynchronously reporting pixel-level log-intensity changes
-with microsecond resolution and a dynamic range exceeding 120\,dB, event
-cameras enable communication links that are simultaneously high-rate,
-motion-tolerant, and robust to extreme illumination---properties that are
-especially valuable when the line-of-sight path is blocked and the
-receiver must recover data from diffuse reflections. This survey traces
-the technical evolution of event-camera-based optical communication from
-its hardware origins (2008--2017) through four developmental stages:
-proof-of-concept event-OCC (2017--2018), spatial encoding and beacon
-systems (2022--2024), the first non-line-of-sight (NLOS) event-camera
-demonstrations (2025), and long-range outdoor plus specialized
-deployments (2025--2026). We organize the literature around three axes:
-hardware capability, modulation/demodulation design, and channel
-environment (line-of-sight vs.\ NLOS vs.\ underwater). For each stage we
-distil the key technical mechanisms---OOK, N-pulse modulation, event
-interval modulation, toggle demodulation, 8b/10b clock recovery, dynamic
-QR-code spatial encoding, and adaptive reflection-based NLOS
-schemes---and tabulate the experimentally demonstrated data-rate-vs-distance
-frontier. We close with open challenges and a roadmap toward
-event-camera-enabled NLOS communication networks for 6G-era applications.
+Event cameras---also termed neuromorphic vision sensors or dynamic vision
+sensors (DVS)---have emerged as a transformative receiver technology for
+optical camera communication (OCC), addressing the temporal sampling
+bottleneck that restricts conventional frame-based cameras to
+sub-kHz effective bandwidths. By asynchronously reporting pixel-level
+log-intensity changes with microsecond temporal resolution and a dynamic
+range exceeding 120\,dB, event cameras support communication links that
+are simultaneously high-rate, motion-tolerant, and robust to extreme
+illumination conditions---attributes of particular value when the
+line-of-sight (LOS) path is obstructed and the receiver must recover
+data from diffuse reflections. This survey traces the technical evolution
+of event-camera-based optical communication from its hardware origins
+(2008--2017) through four developmental stages: proof-of-concept
+event-OCC (2017--2018), spatial encoding and beacon systems
+(2022--2024), the first non-line-of-sight (NLOS) event-camera
+demonstrations (2025), and long-range outdoor together with specialized
+deployments (2025--2026). The literature is organized along three axes:
+hardware capability, modulation and demodulation design, and channel
+environment (LOS, NLOS, and underwater). For each stage, the key
+technical mechanisms are delineated---including On--Off Keying (OOK),
+N-pulse modulation, event interval modulation, toggle demodulation,
+8b/10b-assisted clock recovery, dynamic QR-code spatial encoding, and
+adaptive reflection-based NLOS schemes---and the experimentally
+demonstrated data-rate--versus--distance frontier is tabulated. The
+survey concludes with a discussion of open challenges and a research
+roadmap toward event-camera-enabled NLOS communication networks for
+sixth-generation (6G) applications.
 \end{abstract}
 
 \noindent\textbf{Index Terms}---Event camera, neuromorphic vision sensor,
@@ -80,103 +83,114 @@ shutter, modulation, clock recovery, 6G.
 \section{Introduction}
 \label{sec:intro}
 
-Optical Camera Communication (OCC) uses an image sensor as the receiver
-for visible light communication (VLC), exploiting the camera's spatial
-resolution to discriminate among multiple LED transmitters and reject
-ambient interference. The fundamental limitation of conventional
-frame-based OCC is temporal: a commodity camera captures 30--60 frames
-per second, so the effective sampling bandwidth is below 1\,kHz, even
-with rolling-shutter stripe extraction. LED transmitters, by contrast,
-are modulated in the MHz range. This sampling mismatch---three to four
-orders of magnitude---caps the throughput of frame-based OCC and makes
-it acutely sensitive to motion blur and frame-synchronization errors.
+Optical Camera Communication (OCC) employs an image sensor as the
+receiver for visible light communication (VLC), leveraging the camera's
+spatial resolution to discriminate among multiple LED transmitters and
+suppress ambient interference. The principal limitation of conventional
+frame-based OCC is temporal: a commodity camera acquires 30--60 frames
+per second, yielding an effective sampling bandwidth below 1\,kHz even
+when rolling-shutter stripe extraction is exploited. LED transmitters,
+by contrast, are readily modulated in the MHz range. This sampling
+mismatch---spanning three to four orders of magnitude---imposes a
+fundamental ceiling on frame-based OCC throughput and renders the system
+acutely susceptible to motion blur and frame-synchronization errors.
 
-Event cameras, also called Dynamic Vision Sensors (DVS) or neuromorphic
-vision sensors, dissolve this bottleneck. Each pixel operates
-asynchronously and independently, generating an \emph{event}
-$(x, y, t, p)$ only when the log-intensity change exceeds a threshold,
-where $t$ is a microsecond-resolution timestamp and $p \in \{+1, -1\}$
-is the polarity (brightening vs.\ dimming). The result is a sparse,
-asynchronous stream with three properties that are ideal for OCC:
-(i) \textbf{high temporal resolution} ($\sim$1\,$\mu$s, equivalent to
-$\sim$20--1000\,kHz effective sampling), (ii) \textbf{wide dynamic range}
-($>$120\,dB, vs.\ $\sim$60--70\,dB for CMOS cameras), and
-(iii) \textbf{low data volume and latency} (only changing pixels are
-transmitted, eliminating redundant background frames).
+Event cameras, alternatively referred to as Dynamic Vision Sensors (DVS)
+or neuromorphic vision sensors, overcome this bottleneck through a
+fundamentally different sensing paradigm. Each pixel operates
+asynchronously and independently, emitting an \emph{event}
+$(x, y, t, p)$ only when the logarithmic intensity change exceeds a
+preset threshold, where $t$ denotes a microsecond-resolution timestamp
+and $p \in \{+1, -1\}$ indicates the polarity (brightness increase or
+decrease). The resulting sparse, asynchronous event stream exhibits
+three properties that are particularly advantageous for OCC:
+(i)~\textbf{high temporal resolution} ($\sim$1\,$\mu$s, corresponding to
+an effective sampling rate of $\sim$20--1000\,kHz), (ii)~\textbf{wide
+dynamic range} ($>$120\,dB, compared with $\sim$60--70\,dB for
+conventional CMOS sensors), and (iii)~\textbf{low data volume and
+latency} (only pixels exhibiting intensity changes transmit data,
+thereby eliminating redundant background frames).
 
-These properties become even more critical in Non-Line-of-Sight (NLOS)
-OCC, where the direct LED-to-camera path is blocked and the receiver
-must recover data from diffuse reflections off walls, the ground, or
-ordinary objects. The reflected signal is drastically attenuated, smeared
-by the bidirectional reflectance distribution function (BRDF) of the
-surface, and superimposed on heterogeneous background illumination. An
-event camera's high dynamic range can capture the faint reflected
-intensity changes that a frame-based camera would bury in quantization
-noise, and its asynchronous operation eliminates the frame-sync problem
-that plagues reflected signals with unknown propagation delay.
+These properties assume heightened significance in Non-Line-of-Sight
+(NLOS) OCC, wherein the direct LED-to-camera optical path is obstructed
+and the receiver must recover data from diffuse reflections off walls,
+the ground, or arbitrary objects. The reflected signal undergoes severe
+attenuation, temporal smearing by the bidirectional reflectance
+distribution function (BRDF) of the reflecting surface, and superposition
+with spatially heterogeneous background illumination. The event camera's
+wide dynamic range enables detection of the faint reflected intensity
+variations that a frame-based sensor would embed in quantization noise,
+while its asynchronous architecture eliminates the frame-synchronization
+impediment that afflicts reflected signals subject to unknown and
+geometry-dependent propagation delays.
 
 \paragraph{Scope and contributions.}
 This survey focuses specifically on event cameras as receivers for
-optical communication, with emphasis on the progression toward NLOS
-operation. We trace the technical evolution through four developmental
-stages (Section~\ref{sec:evolution}), analyze the modulation and
-demodulation design space (Section~\ref{sec:modulation}), examine the
-NLOS event-camera channel in detail (Section~\ref{sec:nlos}), and close
-with open challenges and a roadmap (Section~\ref{sec:roadmap}). We
-summarize the experimentally demonstrated data-rate-vs-distance frontier
-in Table~\ref{tab:frontier} and identify the key technical transitions
-that enabled each advance.
+optical communication, with particular emphasis on the progression
+toward NLOS operation. The technical evolution is traced through four
+developmental stages (Section~\ref{sec:evolution}); the modulation and
+demodulation design space is analyzed in Section~\ref{sec:modulation};
+the NLOS event-camera channel is examined in detail in
+Section~\ref{sec:nlos}; and open challenges together with a research
+roadmap are discussed in Section~\ref{sec:roadmap}. The experimentally
+demonstrated data-rate--versus--distance frontier is summarized in
+Table~\ref{tab:frontier}, and the principal technical transitions
+underpinning each advance are identified throughout.
 
 % =============================================================================
 \section{Hardware Foundations}
 \label{sec:hardware}
 
-The event-camera hardware evolution directly enabled the communication
-performance gains surveyed in this paper. Three hardware milestones are
-foundational:
+The evolution of event-camera hardware has been a direct enabler of the
+communication performance gains documented in this survey. Three hardware
+milestones are of foundational significance:
 
 \paragraph{DVS128 (2008).}
-The first commercial event camera, introduced by Lichtsteiner
-\emph{et al.}~\cite{lichtsteiner2008dvs}, featured a $128\times128$ pixel
-array with 40\,$\mu$m pixel pitch, 120\,dB dynamic range, and 15\,$\mu$s
-latency. Its $350$\,nm CMOS process produced high dark current, but the
-asynchronous pixel architecture---a continuous-time logarithmic
-photoreceptor coupled to a self-timed threshold comparator---established
-the event-generation model that all subsequent sensors inherit. The
-DVS128's modest resolution and high noise limited early event-OCC
-experiments to short ranges and low data rates.
+The first commercially available event camera, introduced by Lichtsteiner
+\emph{et al.}~\cite{lichtsteiner2008dvs}, comprised a $128\times128$
+pixel array with 40\,$\mu$m pixel pitch, 120\,dB dynamic range, and
+15\,$\mu$s latency. Although the $350$\,nm CMOS process yielded
+relatively high dark current, the asynchronous pixel architecture---a
+continuous-time logarithmic photoreceptor coupled to a self-timed
+threshold comparator---established the event-generation model inherited
+by all subsequent sensors. The modest resolution and elevated noise
+floor of the DVS128 constrained early event-OCC experiments to short
+ranges and low data rates.
 
 \paragraph{DAVIS240 (2014).}
-Brandli \emph{et al.}~\cite{brandli2014davis240} introduced the DAVIS240,
-a $240\times180$ sensor with 130\,dB dynamic range and 3\,$\mu$s latency.
-Crucially, DAVIS240 interleaves event data with global-shutter
-intensity frames, enabling hybrid processing pipelines that use frames
-for transmitter localization and events for high-speed demodulation.
+Brandli \emph{et al.}~\cite{brandli2014davis240} introduced the
+DAVIS240, a $240\times180$ sensor offering 130\,dB dynamic range and
+3\,$\mu$s latency. A distinguishing feature of the DAVIS240 is its
+interleaving of event data with global-shutter intensity frames, thereby
+enabling hybrid processing pipelines that leverage frames for
+transmitter localization and events for high-speed demodulation.
 
 \paragraph{Samsung VGA DVS (2017).}
 Son \emph{et al.}~\cite{son2017samsungdvs} demonstrated a $640\times480$
-VGA-resolution DVS with 9\,$\mu$m pixels and 300\,Meps (million events
-per second) throughput, fabricated in a BSI CIS process. The higher
-spatial resolution and event throughput directly enabled longer-range
-event-OCC links, as the receiver could resolve smaller LED images at
-greater distances while maintaining sufficient event density for
-demodulation. Subsequent sensors (e.g., Prophesee EVK4 with Sony IMX636,
-$1280\times720$, 4.86\,$\mu$m pixel) continued this trend, reaching the
-$\sim$1\,MHz per-pixel event-rate ceiling exploited by the latest
+VGA-resolution DVS with 9\,$\mu$m pixel pitch and 300\,Meps (million
+events per second) aggregate throughput, fabricated using a
+back-side-illuminated (BSI) CMOS image sensor process. The enhanced
+spatial resolution and event throughput directly facilitated
+longer-range event-OCC links, as the receiver could resolve smaller LED
+images at greater distances while sustaining adequate event density for
+reliable demodulation. Subsequent sensor generations---exemplified by
+the Prophesee EVK4 integrating the Sony IMX636 ($1280\times720$,
+4.86\,$\mu$m pixel)---have extended this trajectory, approaching the
+$\sim$1\,MHz per-pixel event-rate ceiling exploited by the most recent
 long-range demonstrations~\cite{nardo2026longrange}.
 
 % =============================================================================
 \section{Technical Evolution: Four Stages}
 \label{sec:evolution}
 
-The application of event cameras to optical communication has progressed
-through four identifiable stages, each defined by a key technical
-transition. Table~\ref{tab:frontier} summarizes the experimentally
-demonstrated performance milestones.
+The application of event cameras to optical communication has advanced
+through four identifiable stages, each demarcated by a principal
+technical transition. Table~\ref{tab:frontier} summarizes the
+experimentally demonstrated performance milestones across all stages.
 
 \begin{table*}[t]
 \centering
-\caption{Experimentally demonstrated event-OCC performance frontier.}
+\caption{Experimentally demonstrated event-OCC performance frontier across all developmental stages.}
 \label{tab:frontier}
 \small
 \begin{tabularx}{\textwidth}{l l l l l X}
@@ -205,418 +219,458 @@ demonstrated performance milestones.
 \subsection{\stage{1}: Proof-of-Concept Event-OCC (2017--2018)}
 \label{sec:stage1}
 
-The first demonstrations that an event camera could serve as an OCC
-receiver appeared in 2017--2018. Perez-Ramirez \emph{et al.}
-\cite{perez2017eventocc} demonstrated a 500\,bit/s link over 5\,m with
-BER $<10^{-4}$ using On-Off Keying (OOK) and a DVS128 receiver. The key
-insight was that an OOK-modulated LED produces a rising edge (ON event)
-on the pixels imaging the LED when it turns on and a falling edge (OFF
-event) when it turns off; the event stream thus directly encodes the
-bit sequence without the rolling-shutter stripe extraction required by
-frame-based cameras.
+The initial demonstrations of event cameras as OCC receivers appeared in
+2017--2018. Perez-Ramirez \emph{et al.}~\cite{perez2017eventocc}
+established a 500\,bit/s link over 5\,m with BER $<10^{-4}$ using
+On--Off Keying (OOK) and a DVS128 receiver. The underlying principle is
+that an OOK-modulated LED produces a rising-edge (ON) event at the
+pixels imaging the LED upon illumination onset and a falling-edge (OFF)
+event upon extinction; the event stream thus encodes the bit sequence
+directly, obviating the rolling-shutter stripe extraction indispensable
+to frame-based OCC.
 
-Shen \emph{et al.}~\cite{shen2018eventocc} extended this to multi-level
-modulation, achieving 16\,kbit/s at 10\,m using inverse Pulse Position
-Modulation (i-PPM) combined with Frequency Shift Keying (FSK). This work
-first exploited the event camera's microsecond temporal resolution for
-frequency-domain encoding, moving beyond binary OOK. However, BER was
-not evaluated, and the system required a static, aligned link---no motion
-or NLOS capability was demonstrated.
+Shen \emph{et al.}~\cite{shen2018eventocc} extended this paradigm to
+multi-level modulation, achieving 16\,kbit/s at 10\,m through inverse
+Pulse Position Modulation (i-PPM) combined with Frequency Shift Keying
+(FSK). This work was the first to exploit the event camera's
+microsecond temporal resolution for frequency-domain encoding, advancing
+beyond binary OOK. However, the bit error rate was not rigorously
+evaluated, and the system presupposed a static, aligned link; neither
+motion tolerance nor NLOS capability was investigated.
 
-\paragraph{Stage 1 summary.}
-These works established that event cameras can demodulate optical
-signals at rates far exceeding the frame-rate limit, but the
-demonstrated throughput ($\leq$16\,kbit/s) and range ($\leq$10\,m)
-remained modest, and all links were line-of-sight and static.
+\paragraph{Stage~1 summary.}
+These studies established that event cameras can demodulate optical
+signals at rates substantially exceeding the frame-rate limitation.
+Nevertheless, the demonstrated throughput ($\leq$16\,kbit/s) and range
+($\leq$10\,m) remained modest, and all links were confined to
+line-of-sight, static configurations.
 
 % -----------------------------------------------------------------------------
 \subsection{\stage{2}: Spatial Encoding and Beacon Systems (2022--2024)}
 \label{sec:stage2}
 
-The second stage introduced spatial encoding---using the event camera's
-2D pixel array as a communication resource, not just a single-pixel
-detector---and extended the link range by an order of magnitude.
+The second stage introduced spatial encoding---exploiting the event
+camera's two-dimensional pixel array as a communication resource rather
+than a single-pixel detector---and extended the operational range by an
+order of magnitude.
 
 Wang \emph{et al.}~\cite{wang2022beacon} proposed a ``smart visual
-beacon'' architecture at IROS 2022, combining an LED transmitter with
-event-camera demodulation algorithms. They achieved 100\,m at 500\,bit/s
-with zero reported bit errors, quantitatively evaluating the tradeoff
-among LED transmission rate, communication distance, and message
-accuracy. The beacon architecture was designed for robotic
-applications---the event camera on a robot demodulates a beacon on a
-stationary fixture---and it demonstrated that event-OCC could operate at
-ranges relevant to indoor navigation and V2X scenarios.
+beacon'' architecture at IROS 2022, integrating an LED transmitter with
+event-camera demodulation algorithms. The system achieved 100\,m at
+500\,bit/s with zero reported bit errors, accompanied by a quantitative
+evaluation of the trade-offs among LED transmission rate, communication
+distance, and message accuracy. The beacon architecture was conceived
+for robotic applications---an event camera mounted on a robot
+demodulates a beacon affixed to a stationary fixture---and demonstrated
+that event-OCC can operate at ranges pertinent to indoor navigation and
+vehicle-to-everything (V2X) scenarios.
 
 Aranda \emph{et al.}~\cite{aranda2024npulse} introduced N-pulse
-modulation, a scheme specifically designed for the event camera's
-operating principles. Rather than encoding each bit as a single intensity
-transition, N-pulse encodes a symbol as a group of $N$ pulses with a
-defined pattern, adapting the encoding to the packet's bit composition.
-This significantly reduced demodulation complexity compared to OOK and
-PPM, as the receiver could exploit the temporal structure of the pulse
-group rather than relying on per-edge thresholding. The same group
-subsequently evaluated pulse-shaped waveform modulation
-\cite{aranda2025pulseshaped}, leveraging the sensor's high temporal
-resolution for shaped pulses that improve noise resilience.
+modulation, a scheme purpose-designed for the event camera's operational
+principles. Rather than encoding each bit as a single intensity
+transition, N-pulse modulation represents a symbol as a group of $N$
+pulses with a defined temporal pattern, with the encoding adapted to
+the bit composition of the packet. This approach significantly reduced
+demodulation complexity relative to OOK and PPM, as the receiver can
+exploit the temporal structure of the pulse group rather than relying
+on per-edge thresholding. The same group subsequently evaluated
+pulse-shaped waveform modulation~\cite{aranda2025pulseshaped}, leveraging
+the sensor's high temporal resolution through shaped pulses that
+enhance noise resilience.
 
 Von Arnim \emph{et al.}~\cite{vonarnim2024dynamic} addressed the
-practical challenge of dynamic environments, where ambient light and
-target motion change during communication. Their framework achieved
-2.5\,kbit/s with 94\% message accuracy at 0.5\,m---modest numbers, but
-the contribution was robustness to changing conditions rather than raw
-performance.
+practical challenge of dynamic environments, in which ambient
+illumination and target motion vary during communication. Their
+framework attained 2.5\,kbit/s with 94\% message accuracy at 0.5\,m.
+Although these figures are modest in absolute terms, the principal
+contribution lies in robustness to time-varying channel conditions rather
+than raw performance.
 
-\paragraph{Stage 2 summary.}
-Stage 2 expanded event-OCC from a single-pixel novelty to a spatially
-encoded, robot-relevant communication modality. Range extended to 100\,m,
-but throughput remained below 10\,kbit/s, and all links were still
-line-of-sight.
+\paragraph{Stage~2 summary.}
+Stage~2 expanded event-OCC from a single-pixel proof of concept to a
+spatially encoded, robot-relevant communication modality. The
+operational range was extended to 100\,m; however, throughput remained
+below 10\,kbit/s, and all links were still confined to line-of-sight.
 
 % -----------------------------------------------------------------------------
 \subsection{\stage{3}: NLOS Event-Camera Communication (2025)}
 \label{sec:stage3}
 
-The third stage---the central focus of this survey---marks the first
-demonstrations of event cameras for NLOS communication, where the signal
-is recovered from reflections rather than direct line-of-sight.
+The third stage---constituting the central focus of this survey---marks
+the first demonstrations of event cameras for NLOS communication,
+wherein the signal is recovered from reflections rather than from a
+direct line-of-sight path.
 
 \subsubsection{First NLOS event-camera OCC}
-Nishar \emph{et al.}~\cite{nishar2025nlosneuromorphic} (EWSN 2025,
-arXiv:2503.11226) demonstrated the first NLOS optical wireless
-communication using a neuromorphic camera. The key innovation was
-leveraging \emph{passive reflections from everyday objects} as the
+Nishar \emph{et al.}~\cite{nishar2025nlosneuromorphic} (EWSN~2025,
+arXiv:2503.11226) reported the first NLOS optical wireless communication
+system employing a neuromorphic camera. The principal innovation lies
+in leveraging \emph{passive reflections from everyday objects} as the
 communication channel: an LED modulated with OOK or N-pulse modulation
-illuminates a surface (e.g., a wall, a poster, furniture), and the event
-camera detects the intensity changes reflected from that surface---even
-though the camera has no direct view of the LED. The system overcomes
-the event camera's fundamental limitation (it requires intensity
-\emph{changes} to generate events; a static scene produces no events) by
-deliberately inducing VLC-modulated intensity variations, thereby
-generating events even under zero-motion conditions.
+illuminates a surface (e.g., a wall, poster, or piece of furniture), and
+the event camera detects the intensity variations reflected from that
+surface---notwithstanding the absence of a direct view of the LED. The
+system overcomes a fundamental constraint of event cameras---namely,
+that intensity \emph{changes} are required to generate events and a
+perfectly static scene produces none---by deliberately inducing
+VLC-modulated intensity variations of sufficient magnitude to generate
+events via reflection, even under zero-motion conditions.
 
-The paper introduced an \emph{adaptive N-pulse modulation} scheme that
-dynamically adjusts the encoding based on the packet's bit composition,
-optimizing both data rate and robustness. Experimental results revealed
-that lighter-colored, glossy objects are better NLOS communication
-surfaces (higher reflectivity, more specular reflection), while larger
-objects and matte finishes produce higher error rates due to multipath
-reflections that smear the temporal structure of the events.
+The paper further introduced an \emph{adaptive N-pulse modulation}
+scheme that dynamically adjusts the encoding in accordance with the bit
+composition of the packet, thereby optimizing the trade-off between data
+rate and robustness. Experimental results demonstrated that
+lighter-colored, glossy objects serve as superior NLOS communication
+surfaces, owing to higher reflectivity and a more specular reflection
+component. Conversely, larger objects and matte finishes exhibited
+elevated error rates attributable to multipath reflections that smear
+the temporal structure of the event stream.
 
 \subsubsection{Motion-aware spatial encoding}
-Su \emph{et al.}~\cite{su2025motionaware} (IEEE RAL 2025,
+Su \emph{et al.}~\cite{su2025motionaware} (IEEE RAL~2025,
 arXiv:2412.00816) introduced a complementary advance: a dynamic visual
-marker (effectively a QR-code-like spatial pattern displayed on a
-screen) combined with event-based tracking and decoding algorithms. The
-event camera tracks the marker's corners and decodes the spatially
-encoded data simultaneously, achieving 114\,kbit/s in static
-conditions---the highest short-range event-OCC throughput to date---and
-1\,cm localization accuracy with 1\% BER under various camera motions.
-The critical contribution for NLOS is that the event camera's
-motion-blur immunity enables communication even when the receiver is
-moving, a scenario that defeats frame-based OCC due to blur-induced
-stripe distortion. The open-source code and dataset are available at
-\url{https://github.com/suhang99/EventOCC}.
+marker---effectively a QR-code-like spatial pattern rendered on a
+display---coupled with event-based tracking and decoding algorithms. The
+event camera simultaneously tracks the marker's corners and decodes the
+spatially encoded data, achieving 114\,kbit/s under static
+conditions---the highest short-range event-OCC throughput reported to
+date---along with 1\,cm localization accuracy at 1\% BER under various
+camera motions. The contribution of particular relevance to NLOS is
+that the event camera's intrinsic immunity to motion blur preserves
+communication capability even when the receiver is in motion, a scenario
+that renders frame-based OCC unreliable due to blur-induced stripe
+distortion. The open-source code and accompanying dataset are publicly
+available at \url{https://github.com/suhang99/EventOCC}.
 
-\paragraph{Stage 3 summary.}
-Stage 3 established that event cameras can communicate via NLOS
-reflections and under receiver motion---the two capabilities that
-frame-based cameras cannot provide. Throughput reached 114\,kbit/s
-(short-range, spatial encoding), but NLOS-through-reflection throughput
-remained low (order of kbit/s), limited by the reflection channel's
-attenuation and multipath.
+\paragraph{Stage~3 summary.}
+Stage~3 established that event cameras can sustain communication via
+NLOS reflections and under receiver motion---two capabilities
+unattainable with frame-based cameras. Throughput reached 114\,kbit/s
+(short-range, spatial encoding); however, NLOS-through-reflection
+throughput remained limited to the order of kbit/s, constrained by the
+attenuation and multipath characteristics of the reflection channel.
 
 % -----------------------------------------------------------------------------
 \subsection{\stage{4}: Long-Range and Specialized Deployments (2025--2026)}
 \label{sec:stage4}
 
-The fourth stage, currently unfolding, pushes event-OCC to
-deployment-relevant ranges and environments: outdoor long-range links,
-underwater communication, and multi-node networks.
+The fourth stage, presently unfolding, extends event-OCC to
+deployment-relevant ranges and environments, encompassing outdoor
+long-range links, underwater communication, and multi-node network
+configurations.
 
 \subsubsection{Long-range outdoor}
 Sumino \emph{et al.}~\cite{sumino2025longrange} (arXiv:2510.14266,
-GLOBECOM 2025) achieved the first sub-$10^{-3}$ BER long-range outdoor
-event-OCC: 60\,kbit/s at 200\,m and 30\,kbit/s at 400\,m, using OOK with
-toggle demodulation and a digital phase-locked loop (PLL) for clock
-recovery. The toggle demodulation scheme exploits the event camera's
-polarity output: each OOK symbol produces an ON-event burst followed by
-an OFF-event burst, and the demodulator toggles its bit decision based
-on the event polarity, providing intrinsic noise rejection. The digital
-PLL tracks the symbol clock from the event timestamps, handling the
-timing jitter that outdoor turbulence introduces.
+GLOBECOM~2025) reported the first long-range outdoor event-OCC system
+achieving BER $<10^{-3}$: 60\,kbit/s at 200\,m and 30\,kbit/s at 400\,m,
+employing OOK with toggle demodulation and a digital phase-locked loop
+(PLL) for clock recovery. The toggle demodulation scheme exploits the
+polarity output of the event camera: each OOK symbol generates an
+ON-event burst followed by an OFF-event burst, and the demodulator
+alternates its bit decision predicated on the event polarity, thereby
+providing intrinsic noise rejection. The digital PLL recovers the symbol
+clock from the event timestamps, accommodating the timing jitter
+introduced by atmospheric turbulence.
 
-Nardo \emph{et al.}~\cite{nardo2026longrange} (arXiv:2609.29776) pushed
-this further: 80\,kbit/s at 320\,m with a 120$^\circ$ field-of-view
-fisheye lens, using 8b/10b line coding with OOK-NRZ and a Bang-Bang PLL.
-The 8b/10b coding guarantees at least one edge transition every five
-symbols, ensuring continuous event generation even for long runs of
-identical bits. In multi-node operation, three parallel beams yielded
-240\,kbit/s aggregate, with a real-time processing latency under 10\,ms
-per 50\,ms event batch. The system used a Prophesee EVK4 (Sony IMX636)
-sensor; the authors identified the sensor's readout bottleneck
-($\sim$100 lines/$\mu$s) as the factor preventing the theoretical
-1\,MHz bandwidth from being reached in practice.
+Nardo \emph{et al.}~\cite{nardo2026longrange} (arXiv:2609.29776) further
+advanced the state of the art, demonstrating 80\,kbit/s at 320\,m with a
+120$^\circ$ field-of-view fisheye lens, utilizing 8b/10b line coding
+with OOK-NRZ and a Bang-Bang PLL. The 8b/10b coding ensures at least one
+edge transition every five symbols, guaranteeing continuous event
+generation even during extended runs of identical bits. In multi-node
+operation, three parallel beams yielded an aggregate throughput of
+240\,kbit/s, with real-time processing latency below 10\,ms per 50\,ms
+event batch. The system employed a Prophesee EVK4 (Sony IMX636) sensor;
+the authors identified the sensor readout bottleneck
+($\sim$100\,lines/$\mu$s) as the factor precluding attainment of the
+theoretical 1\,MHz bandwidth in practice.
 
 \subsubsection{Novel modulation: Event Interval Modulation}
 Sumino \emph{et al.}~\cite{sumino2025eim} (arXiv:2510.14245) proposed
 Event Interval Modulation (EIM), the first modulation scheme designed
-specifically for event cameras. Rather than encoding information in the
-presence/absence of events (OOK) or in pulse patterns (N-pulse), EIM
+expressly for event cameras. Rather than encoding information in the
+presence or absence of events (OOK) or in pulse patterns (N-pulse), EIM
 encodes information in the \emph{time intervals between consecutive
-events}. This fully exploits the event camera's asynchronous temporal
-resolution and enables higher-order modulation: the interval length
-maps to a symbol, so $M$-ary EIM carries $\log_2 M$ bits per event.
-The proof-of-concept achieved 28\,kbit/s at 10\,m and 8.4\,kbit/s at
-50\,m indoors, setting a new benchmark for event-OCC bit rate in the
-moderate-range regime.
+events}. This approach fully exploits the asynchronous temporal
+resolution of the event camera and facilitates higher-order modulation:
+the interval duration maps to a symbol, such that $M$-ary EIM conveys
+$\log_2 M$ bits per event. The proof-of-concept demonstration achieved
+28\,kbit/s at 10\,m and 8.4\,kbit/s at 50\,m indoors, establishing a new
+benchmark for event-OCC bit rate in the moderate-range regime.
 
 \subsubsection{Underwater event-camera ISAC}
 Fang \emph{et al.}~\cite{fang2026underwater} (Frontiers in Marine
-Science 2026) extended event-camera OCC to the underwater domain,
-demonstrating an event-based camera-enabled underwater optical
-integrated sensing and communication (ISAC) system. This is notable as
-the first cross-medium event-OCC: the underwater channel's
-wavelength-dependent absorption and particulate scattering are
-analogous to an extreme NLOS channel, and the event camera's high
-dynamic range is essential for coping with the rapid intensity
-fluctuations caused by water turbulence.
+Science, 2026) extended event-camera OCC to the underwater domain,
+presenting an event-based camera-enabled underwater optical integrated
+sensing and communication (ISAC) system. This work is noteworthy as the
+first cross-medium event-OCC demonstration: the wavelength-dependent
+absorption and particulate scattering characteristic of the underwater
+channel are analogous to an extreme NLOS environment, and the event
+camera's wide dynamic range is indispensable for accommodating the rapid
+intensity fluctuations induced by water turbulence.
 
 \subsubsection{MISO and real-time systems}
-Mu\~noz \emph{et al.}~\cite{munoz2026miso} (IEEE PTL 2026) designed a
-feedback-aware MISO event-OCC system with an LED array transmitter and
-event camera receiver, achieving near-real-time operation by leveraging
-event-driven sensing and a lightweight demodulation scheme. The feedback
-channel allows the transmitter to adapt its modulation parameters based
-on receiver-side event-rate feedback, closing the loop for adaptive
-event-OCC.
+Mu\~noz \emph{et al.}~\cite{munoz2026miso} (IEEE PTL, 2026) designed a
+feedback-aware multiple-input single-output (MISO) event-OCC system
+comprising an LED array transmitter and an event-camera receiver,
+achieving near-real-time operation through event-driven sensing coupled
+with a lightweight demodulation scheme. The feedback channel enables the
+transmitter to adapt its modulation parameters predicated on
+receiver-side event-rate feedback, thereby closing the control loop for
+adaptive event-OCC.
 
-\paragraph{Stage 4 summary.}
-Stage 4 has brought event-OCC to deployment-relevant regimes:
-320\,m outdoor range, 240\,kbit/s multi-node throughput, underwater
-operation, and closed-loop adaptation. The data-rate-vs-distance
-frontier has advanced by 2--3 orders of magnitude since Stage 1.
+\paragraph{Stage~4 summary.}
+Stage~4 has brought event-OCC to deployment-relevant regimes:
+320\,m outdoor range, 240\,kbit/s aggregate multi-node throughput,
+underwater operation, and closed-loop adaptation. The
+data-rate--versus--distance frontier has advanced by two to three orders
+of magnitude relative to Stage~1.
 
 % =============================================================================
 \section{Modulation and Demodulation Design Space}
 \label{sec:modulation}
 
-The event camera's unique sensing model---asynchronous, differential,
-polarity-labeled---has motivated a distinct modulation design space that
-differs fundamentally from both photodiode-based VLC and frame-based OCC.
-We organize the schemes into three categories.
+The distinctive sensing model of the event camera---asynchronous,
+differential, and polarity-labeled---has engendered a modulation design
+space that differs fundamentally from both photodiode-based VLC and
+frame-based OCC. The proposed schemes can be classified into four
+categories.
 
 \subsection{Edge-Transition-Based Schemes}
 \label{sec:edge}
 
-The simplest and most widely used approach exploits the event camera's
-native output: each intensity transition generates an event. OOK
-modulation maps a ``1'' to an ON-event and a ``0'' to an OFF-event; the
-receiver demodulates by checking the polarity of the event stream within
-each symbol period~\cite{perez2017eventocc, sumino2025longrange,
-nardo2026longrange}. The challenge is clock recovery: long runs of
+The most extensively employed approach exploits the native output of the
+event camera: each intensity transition generates an event. In OOK
+modulation, a logical ``1'' maps to an ON-event and a logical ``0'' to
+an OFF-event; the receiver demodulates by evaluating the polarity of the
+event stream within each symbol
+period~\cite{perez2017eventocc, sumino2025longrange, nardo2026longrange}.
+The principal challenge lies in clock recovery: prolonged runs of
 identical bits produce no events, causing the receiver to lose symbol
-alignment. Two solutions have been demonstrated:
+alignment. Two mitigation strategies have been demonstrated:
 \begin{itemize}
   \item \textbf{8b/10b line coding}~\cite{nardo2026longrange}: guarantees
-    at least one transition every five symbols, ensuring continuous
-    event generation at the cost of 25\% overhead.
+    a minimum of one transition every five symbols, ensuring continuous
+    event generation at the expense of 25\% coding overhead.
   \item \textbf{Toggle demodulation}~\cite{sumino2025longrange}: each
-    symbol period is expected to contain both an ON and an OFF event;
-    the demodulator toggles its decision based on which arrives first,
-    providing intrinsic noise rejection.
+    symbol period is expected to contain both an ON-event and an
+    OFF-event; the demodulator alternates its decision predicated on
+    which event type arrives first, thereby providing intrinsic noise
+    rejection.
 \end{itemize}
 
 \subsection{Pulse-Pattern Schemes}
 \label{sec:pulse}
 
 N-pulse modulation~\cite{aranda2024npulse} encodes a symbol as a group
-of $N$ pulses with a defined temporal pattern, adapting the pattern to
-the bit composition of the packet. The receiver correlates the event
+of $N$ pulses with a defined temporal pattern, with the pattern adapted
+to the bit composition of the packet. The receiver correlates the event
 stream against the expected patterns, exploiting the temporal structure
 for noise rejection. The adaptive variant~\cite{nishar2025nlosneuromorphic}
-dynamically selects the pattern based on the packet's bit distribution,
-optimizing the tradeoff between data rate and robustness. Pulse-shaped
-waveform modulation~\cite{aranda2025pulseshaped} further shapes the
-pulse waveform to exploit the sensor's high temporal resolution.
+dynamically selects the pattern on the basis of the packet's bit
+distribution, optimizing the trade-off between data rate and robustness.
+Pulse-shaped waveform modulation~\cite{aranda2025pulseshaped} further
+sculpts the pulse waveform to exploit the sensor's high temporal
+resolution, enhancing resilience to noise.
 
 \subsection{Interval-and-Position Schemes}
 \label{sec:interval}
 
 Event Interval Modulation (EIM)~\cite{sumino2025eim} encodes information
 in the time intervals between consecutive events, enabling $M$-ary
-modulation where each interval maps to $\log_2 M$ bits. Inverse PPM
+modulation in which each interval conveys $\log_2 M$ bits. Inverse PPM
 \cite{shen2018eventocc} and FSK~\cite{shen2018eventocc} encode
 information in the temporal position and frequency of event bursts,
 respectively. These schemes fully exploit the microsecond temporal
-resolution but require precise timing extraction and are sensitive to
-event jitter.
+resolution of the event camera but necessitate precise timing extraction
+and exhibit sensitivity to event jitter.
 
 \subsection{Spatial Encoding}
 \label{sec:spatial}
 
-The event camera's 2D pixel array enables spatial multiplexing: the
-dynamic QR-code approach~\cite{su2025motionaware} displays a
-spatially-encoded pattern on a screen, and the event camera decodes the
-pattern by tracking corner features and reading the spatial cells. This
-achieves the highest short-range throughput (114\,kbit/s) but requires a
-display transmitter and is limited by the camera's spatial resolution.
-The smart visual beacon~\cite{wang2022beacon} uses a simpler spatial
-structure (a single LED or small array) with spatial tracking for
-robotic applications.
+The two-dimensional pixel array of the event camera affords spatial
+multiplexing: the dynamic QR-code approach~\cite{su2025motionaware}
+renders a spatially encoded pattern on a display, and the event camera
+decodes the pattern by tracking corner features and reading the spatial
+cells. This approach attains the highest short-range throughput
+(114\,kbit/s) but requires a display-class transmitter and is ultimately
+constrained by the camera's spatial resolution. The smart visual
+beacon~\cite{wang2022beacon} employs a simpler spatial structure---a
+single LED or compact array---with spatial tracking tailored to robotic
+applications.
 
 % =============================================================================
 \section{The NLOS Event-Camera Channel}
 \label{sec:nlos}
 
-NLOS event-camera communication is the frontier that most distinguishes
-this technology from photodiode-based VLC and frame-based OCC. We
-examine the channel characteristics and the techniques that make NLOS
-event-OCC feasible.
+NLOS event-camera communication represents the frontier that most
+sharply distinguishes this technology from photodiode-based VLC and
+frame-based OCC. The following subsections examine the channel
+characteristics and the technical mechanisms that render NLOS event-OCC
+viable.
 
 \subsection{The Reflection Channel}
 \label{sec:reflection}
 
 In NLOS-OCC, the LED transmitter illuminates a reflecting surface (wall,
-ground, object), and the event camera images the surface to detect the
-modulated intensity changes in the reflected light. The channel is
-characterized by:
+ground, or object), and the event camera images the surface to detect
+the modulated intensity variations in the reflected light. The channel
+is characterized by three principal impairment mechanisms:
 \begin{itemize}
   \item \textbf{Path loss}: the reflected optical power is attenuated by
     the product of the LED-to-surface and surface-to-camera path losses,
-    plus the surface reflectance (typically 0.05--0.9 depending on
-    material and wavelength).
-  \item \textbf{BRDF smearing}: the Bidirectional Reflectance
-    Distribution Function of the surface spreads the reflected light
-    over a range of angles, reducing the intensity at the camera and
-    blurring the temporal modulation. Matte surfaces produce diffuse
-    (Lambertian) reflections with severe multipath; glossy surfaces
-    produce more specular reflections that preserve temporal structure.
-  \item \textbf{Multipath}: photons reflected via different paths arrive
-    at different times, causing inter-symbol interference. Nishar
-    \emph{et al.}~\cite{nishar2025nlosneuromorphic} confirmed that
-    larger objects and matte finishes produce higher BER due to
-    multipath, while lighter-colored glossy surfaces are better.
+    compounded by the surface reflectance (typically 0.05--0.9, dependent
+    on material and wavelength).
+  \item \textbf{BRDF-induced temporal smearing}: the bidirectional
+    reflectance distribution function of the surface redistributes the
+    reflected light over a range of angles, attenuating the intensity at
+    the camera and blurring the temporal modulation. Matte surfaces
+    produce diffuse (Lambertian) reflections accompanied by severe
+    multipath; glossy surfaces yield more specular reflections that
+    better preserve the temporal structure of the modulation.
+  \item \textbf{Multipath-induced inter-symbol interference}: photons
+    traversing different reflection paths arrive at the receiver with
+    disparate delays, engendering inter-symbol interference. Nishar
+    \emph{et al.}~\cite{nishar2025nlosneuromorphic} empirically confirmed
+    that larger objects and matte finishes produce higher BER due to
+    multipath, whereas lighter-colored, glossy surfaces exhibit superior
+    performance.
 \end{itemize}
 
-A simplified mathematical model for the NLOS-OCC channel with a patterned
-reflective surface was developed by He \emph{et al.}~\cite{he2023nlosmodel},
-providing the channel-characterization foundation for NLOS event-camera
-work.
+A simplified mathematical model for the NLOS-OCC channel with a
+patterned reflective surface was developed by He \emph{et al.}
+\cite{he2023nlosmodel}, furnishing the channel-characterization
+foundation for subsequent NLOS event-camera research.
 
-\subsection{Why Event Cameras Excel at NLOS}
+\subsection{Advantages of Event Cameras for NLOS Communication}
 \label{sec:why}
 
-Three properties of event cameras are particularly advantageous for NLOS
-communication:
+Three intrinsic properties of event cameras confer particular advantages
+for NLOS communication:
 \begin{enumerate}
-  \item \textbf{Dynamic range} ($>$120\,dB): the reflected signal may be
-    30--60\,dB weaker than the direct signal. A frame-based camera with
-    60--70\,dB dynamic range cannot simultaneously capture the bright
-    background and the faint reflected modulation without saturation or
-    quantization loss. An event camera's logarithmic photoreceptor
-    handles this range natively.
-  \item \textbf{Asynchronous operation}: the reflected signal's
-    propagation delay is unknown and varies with geometry. Frame-based
-    OCC requires frame-level synchronization, which fails when the
-    delay is not an integer multiple of the frame period. Event cameras
-    have no frame structure; each event is timestamped independently,
-    so the receiver recovers timing from the event stream itself via a
-    digital PLL~\cite{sumino2025longrange, nardo2026longrange}.
-  \item \textbf{Motion tolerance}: in mobile NLOS scenarios (e.g., a
-    vehicle receiving a reflected signal from a taillight while
-    moving), frame-based cameras suffer motion blur that smears the
-    stripes. Event cameras produce no blur---each pixel reports the
-    intensity change at the moment it occurs, regardless of camera
+  \item \textbf{Wide dynamic range} ($>$120\,dB): the reflected signal
+    may be 30--60\,dB weaker than the direct signal. A frame-based
+    camera with 60--70\,dB dynamic range cannot simultaneously capture
+    the bright ambient background and the faint reflected modulation
+    without incurring saturation or quantization loss. The logarithmic
+    photoreceptor of the event camera accommodates this dynamic range
+    natively.
+  \item \textbf{Asynchronous operation}: the propagation delay of the
+    reflected signal is \emph{a priori} unknown and varies with
+    geometry. Frame-based OCC necessitates frame-level synchronization,
+    which degenerates when the delay is not an integer multiple of the
+    frame period. Event cameras possess no frame structure; each event
+    is timestamped independently, enabling the receiver to recover
+    timing directly from the event stream via a digital
+    PLL~\cite{sumino2025longrange, nardo2026longrange}.
+  \item \textbf{Motion tolerance}: in mobile NLOS scenarios---for
+    instance, a vehicle receiving a reflected signal from a taillight
+    while in motion---frame-based cameras suffer motion blur that smears
+    the rolling-shutter stripes. Event cameras are inherently free of
+    motion blur: each pixel reports the intensity change at the instant
+    of its occurrence, irrespective of camera
     motion~\cite{su2025motionaware}.
 \end{enumerate}
 
 \subsection{The Static-Scene Challenge}
 \label{sec:static}
 
-A unique challenge of event cameras is that a static scene produces no
-events. In LOS OCC this is not a problem (the LED is modulated, so its
-pixels always have intensity changes), but in NLOS OCC the reflected
-intensity change may be too small to exceed the event threshold,
-especially with matte surfaces. Nishar \emph{et al.}
+A distinctive challenge associated with event cameras is that a static
+scene produces no events. In LOS OCC this does not arise as a concern
+(the LED is modulated, ensuring that its imaging pixels consistently
+exhibit intensity changes); however, in NLOS OCC the reflected intensity
+variation may be insufficient to exceed the event threshold, a
+particular concern for matte surfaces. Nishar \emph{et al.}
 \cite{nishar2025nlosneuromorphic} addressed this by deliberately
-inducing VLC-modulated intensity variations strong enough to generate
-events via reflection, and by tuning the event threshold to the
-reflection's contrast level. Future work may exploit adaptive threshold
-control---dynamically adjusting the event threshold per-pixel based on
-the local reflected signal strength.
+inducing VLC-modulated intensity variations of adequate magnitude to
+generate events via reflection, and by tuning the event threshold to the
+contrast level of the reflected signal. Future investigations may
+explore adaptive threshold control---dynamically adjusting the per-pixel
+event threshold predicated on the local reflected signal strength.
 
 % =============================================================================
 \section{Open Challenges and Roadmap}
 \label{sec:roadmap}
 
 \paragraph{NLOS throughput.}
-The current NLOS event-OCC throughput (order of kbit/s via passive
-reflection) is 1--2 orders of magnitude below the LOS frontier
-(80--240\,kbit/s). Closing this gap requires: (i) higher-gain optical
-front-ends (telescopic lenses, Fresnel concentrators) to collect more
-reflected photons; (ii) adaptive event-threshold control to match the
-reflection's contrast; and (iii) channel coding (Raptor/RaptorQ fountain
-codes) tailored to the burst-error profile of the reflection channel.
+The current NLOS event-OCC throughput (on the order of kbit/s via
+passive reflection) lags the LOS frontier (80--240\,kbit/s) by one to
+two orders of magnitude. Closing this disparity necessitates:
+(i)~higher-gain optical front-ends (telescopic lenses, Fresnel
+concentrators) to collect a greater fraction of the reflected photons;
+(ii)~adaptive event-threshold control matched to the contrast of the
+reflected signal; and (iii)~channel coding (e.g., Raptor/RaptorQ
+fountain codes) tailored to the burst-error profile characteristic of
+the reflection channel.
 
 \paragraph{NLOS channel modeling.}
 Accurate analytical and ray-tracing models for the event-camera NLOS
 channel---incorporating BRDF, multipath, and the event-generation
-threshold---are lacking. The simplified model of He \emph{et al.}
-\cite{he2023nlosmodel} is a start but does not account for the event
-camera's differential sensing model. A unified channel model that
-connects the optical power at the pixel to the event-generation rate is
-needed.
+threshold---remain lacking. The simplified model of He \emph{et al.}
+\cite{he2023nlosmodel} provides a point of departure but does not
+account for the differential sensing model of the event camera. A
+unified channel model that establishes a quantitative mapping from the
+optical power incident on the pixel to the event-generation rate is
+required.
 
-\paragraph{Modulation for NLOS.}
-The adaptive N-pulse scheme~\cite{nishar2025nlosneuromorphic} is the
-only modulation designed for NLOS event-OCC. EIM~\cite{sumino2025eim}
-and 8b/10b+OOK~\cite{nardo2026longrange} have been demonstrated only in
-LOS. Extending these to NLOS---where the signal-to-noise ratio is much
-lower and multipath causes inter-event interference---is an open problem.
+\paragraph{Modulation design for NLOS.}
+The adaptive N-pulse scheme~\cite{nishar2025nlosneuromorphic} remains
+the sole modulation formulated specifically for NLOS event-OCC. Both
+EIM~\cite{sumino2025eim} and 8b/10b-assisted
+OOK~\cite{nardo2026longrange} have been validated exclusively under LOS
+conditions. Extending these schemes to the NLOS regime---characterized
+by substantially lower signal-to-noise ratios and inter-event
+interference induced by multipath---constitutes an open problem.
 
 \paragraph{Multi-node and networking.}
 The multi-node demonstration of Nardo \emph{et al.}
-\cite{nardo2026longrange} (3 beams, 240\,kbit/s) is the only multi-node
-event-OCC result. A complete networking stack---medium access control,
-addressing, relaying---for event-camera networks does not yet exist.
-The IEEE 802.15.7a-2024 standard's AI-PHY and relaying provisions
-provide a framework, but event-camera-specific adaptations are needed.
+\cite{nardo2026longrange} (three beams, 240\,kbit/s aggregate) remains
+the sole multi-node event-OCC result. A comprehensive networking
+stack---encompassing medium access control, addressing, and
+relaying---for event-camera-based networks has yet to be developed. The
+AI-PHY and relaying provisions of the IEEE~802.15.7a-2024 standard
+furnish a framework, but event-camera-specific adaptations are
+requisite.
 
 \paragraph{Cross-medium and extreme environments.}
-The underwater event-camera ISAC of Fang \emph{et al.}
-\cite{fang2026underwater} is a promising start, but the underwater
-channel's absorption and turbulence are far more severe than air.
-Space-air-ground-sea architectures integrating event-camera OCC with RF
-and FSO are a long-term vision.
+The underwater event-camera ISAC system of Fang \emph{et al.}
+\cite{fang2026underwater} represents a promising initial foray;
+nevertheless, the absorption and turbulence characteristics of the
+underwater channel are considerably more severe than those of the
+atmospheric channel. Space--air--ground--sea architectures integrating
+event-camera OCC with RF and free-space optical (FSO) communication
+constitute a compelling long-term vision.
 
 \paragraph{Hardware co-design.}
 The readout bottleneck identified by Nardo \emph{et al.}
-\cite{nardo2026longrange} ($\sim$100 lines/$\mu$s) limits the practical
-bandwidth to well below the sensor's per-pixel event-rate ceiling.
-Sensor-level innovations---parallel readout, on-chip event
-processing---are needed to unlock the full $\sim$1\,MHz bandwidth.
+\cite{nardo2026longrange} ($\sim$100\,lines/$\mu$s) constrains the
+practical bandwidth to a value substantially below the per-pixel
+event-rate ceiling of the sensor. Sensor-level innovations---including
+parallel readout architectures and on-chip event processing---are
+requisite to unlock the full $\sim$1\,MHz bandwidth.
 
 % =============================================================================
 \section{Conclusion}
 \label{sec:conclusion}
 
-Event cameras have progressed from a vision-sensing novelty to a
+Event cameras have evolved from a vision-sensing innovation into a
 communication receiver capable of 80\,kbit/s at 320\,m (LOS outdoor),
-114\,kbit/s at short range (spatial encoding), and---crucially---kbit/s-rate
-communication via passive NLOS reflections from everyday objects. The
-technical evolution has advanced through four stages: proof-of-concept
-OOK (2017), spatial encoding and beacon systems (2022--2024), the first
-NLOS event-camera demonstrations (2025), and long-range outdoor plus
-specialized deployments (2025--2026). The key enablers have been the
-event camera's microsecond temporal resolution, $>$120\,dB dynamic range,
-and asynchronous, motion-blur-free operation---properties that are
-uniquely suited to the NLOS reflection channel. The open challenges are
-NLOS throughput, channel modeling, NLOS-specific modulation, multi-node
-networking, and hardware co-design. As event-camera hardware continues
-to improve and the 6G vision of integrated sensing and communication
-matures, event-camera-based NLOS OCC is positioned to become a key
-enabling technology for vehicular, robotic, and IoT networks in
-cluttered, occluded, and extreme environments.
+114\,kbit/s at short range (spatial encoding), and---most
+significantly---kbit/s-rate communication via passive NLOS reflections
+from everyday objects. The technical evolution has progressed through
+four stages: proof-of-concept OOK (2017), spatial encoding and beacon
+systems (2022--2024), the first NLOS event-camera demonstrations (2025),
+and long-range outdoor together with specialized deployments
+(2025--2026). The key enablers are the event camera's microsecond
+temporal resolution, dynamic range exceeding 120\,dB, and asynchronous,
+motion-blur-free operation---properties uniquely suited to the NLOS
+reflection channel. The principal open challenges encompass NLOS
+throughput enhancement, channel modeling, NLOS-specific modulation
+design, multi-node networking, and hardware co-design. As event-camera
+hardware continues to mature and the 6G vision of integrated sensing and
+communication crystallizes, event-camera-based NLOS OCC is poised to
+become a key enabling technology for vehicular, robotic, and IoT
+networks operating in cluttered, occluded, and extreme environments.
 
 % =============================================================================
 \bibliographystyle{plain}
